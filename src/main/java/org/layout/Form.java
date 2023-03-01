@@ -1,5 +1,7 @@
 package org.layout;
 
+import org.layout.APIHandleUtils.MangaDexApiHandling;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -26,17 +28,26 @@ public class Form {
 //        panel.setLayout(new GridBagLayout());
 //        panel.add(new JLabel("Second page", SwingConstants.CENTER));
 //        panel1.add(panel, constraints);
-//
-//        button1.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//
-//            }
-//        });
 
+        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(5);
         Transition transition = new Transition();
-        transition.display(new JLabel("Yeah"));
+
+        transition.display(new ContentScroll().contentScroll);
         panel1.add(transition);
+
+        button1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                transition.display(new JLabel("ok"));
+            }
+        });
+
+        button2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                transition.display(new JLabel("Yeah1"));
+            }
+        });
     }
 
     public static void main(String[] args) {

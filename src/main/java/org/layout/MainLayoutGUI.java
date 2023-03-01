@@ -39,65 +39,28 @@ public class MainLayoutGUI {
      * */
 
     public MainLayoutGUI() {
-        DefaultTableModel model = new DefaultTableModel() {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-
-        contentTable.setModel(model);
-
-        model.addColumn("Title");
-        model.addColumn("Author");
-        model.addColumn("Genre");
-        model.addColumn("Status");
-        model.addColumn("Year Release");
-        model.addColumn("Chapter");
-
-        contentTable.setModel(model);
-        contentTable.getTableHeader().setReorderingAllowed(false);
-
-        for (Manga manga : mangaArray) {
-            model.addRow(new Object[]{manga.getTitle(), manga.getAuthor(), manga.getGenre(), manga.getStatus(),
-                    manga.getYearRelease(), manga.getChapters()});
-        }
-
-        TableColumnModel columns = contentTable.getColumnModel();
-        DefaultTableCellRenderer centerColumn = new DefaultTableCellRenderer();
-        centerColumn.setHorizontalAlignment(JLabel.CENTER);
-        columns.getColumn(3).setCellRenderer(centerColumn);
-        columns.getColumn(4).setCellRenderer(centerColumn);
-        columns.getColumn(5).setCellRenderer(centerColumn);
-
-        ListSelectionModel cellSelectionModel = contentTable.getSelectionModel();
-        cellSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        cellSelectionModel.addListSelectionListener(e -> {
-            int selectedRow = contentTable.getSelectedRow();
-            String selectedData = (String) contentTable.getValueAt(selectedRow, 0);
-        });
-
-        JPanel addPanel = new JPanel();
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
-        addPanel.setLayout(new GridBagLayout());
-        JLabel l = new JLabel("Add");
-        l.setForeground(Color.WHITE);
-        addPanel.add(l, constraints);
-        addPanel.setVisible(false);
-        contentTable.add(addPanel);
+        constraints.weightx = 1;
+        constraints.weighty = 1;
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        Transition transition = new Transition();
+        ContentScroll contentTable = new ContentScroll();
+        transition.display(contentTable.contentScroll);
+        contentLayout.add(transition, constraints);
 
         homeButton.addActionListener(e -> {
-            contentScroll.setVisible(true);
-            addPanel.setVisible(false);
+            JPanel panel = new JPanel();
+            panel.setLayout(new GridBagLayout());
+            panel.add(new JLabel("click"));
+
+            transition.display(panel);
         });
 
         addButton.addActionListener(e -> {
-            contentScroll.setVisible(false);
-            contentScroll.setOpaque(false);
-            addPanel.setVisible(true);
+//            contentScroll.setVisible(false);
         });
 
         quitButton.addActionListener(new ActionListener() {
@@ -109,7 +72,7 @@ public class MainLayoutGUI {
     }
 
     public static void main(String[] args) {
-        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(20);
+        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(5);
         JFrame frame = new JFrame("Register");
 //        frame.setResizable(false);
         frame.setContentPane(new MainLayoutGUI().MainPanel);
