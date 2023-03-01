@@ -140,7 +140,28 @@
                 <border type="line">
                   <color color="-1575182"/>
                 </border>
-                <children/>
+                <children>
+                  <scrollpane id="acf4f" binding="contentScroll">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="1.0" weighty="1.0"/>
+                    </constraints>
+                    <properties>
+                      <background color="-13880525"/>
+                      <foreground color="-13880525"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <component id="55c59" class="javax.swing.JTable" binding="contentTable">
+                        <constraints/>
+                        <properties>
+                          <background color="-13880525"/>
+                          <foreground color="-1575182"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </scrollpane>
+                </children>
               </grid>
             </children>
           </grid>

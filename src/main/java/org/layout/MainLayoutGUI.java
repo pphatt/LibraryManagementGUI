@@ -1,7 +1,20 @@
 package org.layout;
 
+import org.layout.APIHandleUtils.Manga;
+import org.layout.APIHandleUtils.MangaDexApiHandling;
+
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import static org.layout.APIHandleUtils.MangaDexApiHandling.mangaArray;
 
 public class MainLayoutGUI {
     private JPanel MainPanel;
@@ -14,6 +27,8 @@ public class MainLayoutGUI {
     private JButton addButton;
     private JButton quitButton;
     private JPanel contentLayout;
+    private JTable contentTable;
+    private JScrollPane contentScroll;
 
     /*
      * Gridbaglayout Properties:
@@ -24,38 +39,77 @@ public class MainLayoutGUI {
      * */
 
     public MainLayoutGUI() {
-        JPanel layout = new JPanel();
-        layout.setBackground(Color.getColor("#2C3333"));
-        layout.setForeground(Color.getColor("#2C3333"));
-        layout.setLayout(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
+        DefaultTableModel model = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
 
-        for (int column = 0; column < 100; column++) {
-            JPanel test = new JPanel();
-            test.setBackground(Color.getColor("#2C3333"));
-            JButton button = new JButton("Click" + column);
-            test.add(button);
-            constraints.gridx = column > 10 ? column - (10 * (column / 10)) : column;
-            constraints.gridy = column > 10 ? column / 10 : 0;
-            constraints.weightx = 1;
-            constraints.weighty = 1;
-            constraints.anchor = GridBagConstraints.FIRST_LINE_START;
-            layout.add(test, constraints);
+        contentTable.setModel(model);
+
+        model.addColumn("Title");
+        model.addColumn("Author");
+        model.addColumn("Genre");
+        model.addColumn("Status");
+        model.addColumn("Year Release");
+        model.addColumn("Chapter");
+
+        contentTable.setModel(model);
+        contentTable.getTableHeader().setReorderingAllowed(false);
+
+        for (Manga manga : mangaArray) {
+            model.addRow(new Object[]{manga.getTitle(), manga.getAuthor(), manga.getGenre(), manga.getStatus(),
+                    manga.getYearRelease(), manga.getChapters()});
         }
 
+        TableColumnModel columns = contentTable.getColumnModel();
+        DefaultTableCellRenderer centerColumn = new DefaultTableCellRenderer();
+        centerColumn.setHorizontalAlignment(JLabel.CENTER);
+        columns.getColumn(3).setCellRenderer(centerColumn);
+        columns.getColumn(4).setCellRenderer(centerColumn);
+        columns.getColumn(5).setCellRenderer(centerColumn);
+
+        ListSelectionModel cellSelectionModel = contentTable.getSelectionModel();
+        cellSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        cellSelectionModel.addListSelectionListener(e -> {
+            int selectedRow = contentTable.getSelectedRow();
+            String selectedData = (String) contentTable.getValueAt(selectedRow, 0);
+        });
+
+        JPanel addPanel = new JPanel();
+        GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
-        constraints.weightx = 1;
-        constraints.weighty = 1;
-        constraints.fill = GridBagConstraints.BOTH;
-        constraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        JScrollPane scrollLayout = new JScrollPane(layout);
-//        scrollLayout.add(layout);
-        scrollLayout.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        contentLayout.add(scrollLayout, constraints);
+        addPanel.setLayout(new GridBagLayout());
+        JLabel l = new JLabel("Add");
+        l.setForeground(Color.WHITE);
+        addPanel.add(l, constraints);
+        addPanel.setVisible(false);
+        contentTable.add(addPanel);
+
+        homeButton.addActionListener(e -> {
+            contentScroll.setVisible(true);
+            addPanel.setVisible(false);
+        });
+
+        addButton.addActionListener(e -> {
+            contentScroll.setVisible(false);
+            contentScroll.setOpaque(false);
+            addPanel.setVisible(true);
+        });
+
+        quitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
     }
 
     public static void main(String[] args) {
+        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(20);
         JFrame frame = new JFrame("Register");
 //        frame.setResizable(false);
         frame.setContentPane(new MainLayoutGUI().MainPanel);

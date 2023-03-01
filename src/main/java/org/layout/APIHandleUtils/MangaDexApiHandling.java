@@ -19,7 +19,8 @@ public class MangaDexApiHandling {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.mangadex.org/manga?limit=" + amount + "&includes[]=cover_art"))
+                .uri(URI.create("https://api.mangadex.org/manga?limit=" + amount +
+                        "&includes[]=cover_art&includes[]=author&contentRating[]=safe&contentRating[]=suggestive"))
                 .build();
 
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
@@ -30,6 +31,10 @@ public class MangaDexApiHandling {
         for (int i = 0; i < amount; i++) {
             System.out.println("Uuid: " + mangaArray.get(i).getUuid());
             System.out.println("Title: " + mangaArray.get(i).getTitle());
+            System.out.println("Author: " + mangaArray.get(i).getAuthor());
+            System.out.println("Genre: " + mangaArray.get(i).getGenre());
+            System.out.println("Status: " + mangaArray.get(i).getStatus());
+            System.out.println("Year Release: " + mangaArray.get(i).getYearRelease());
             System.out.println("Description: " + mangaArray.get(i).getDescription());
             System.out.println("Cover: " + mangaArray.get(i).getCover());
             System.out.println("Chapter: " + mangaArray.get(i).getChapters());
@@ -47,23 +52,55 @@ public class MangaDexApiHandling {
             JSONObject attributes = mangaObject.getJSONObject("attributes");
             JSONArray relationships = mangaObject.getJSONArray("relationships");
 
-            String title = "";
+            String title = "Not available";
 
             try {
                 title = attributes.getJSONObject("title")
-                        .getString("en");
+                        .getString("en").trim();
             } catch (JSONException ignored) {
             }
 
-            String description = "";
+            System.out.println(title);
+
+            String author = "Not available";
+
+            try {
+                author = relationships.getJSONObject(0)
+                        .getJSONObject("attributes")
+                        .getString("name").trim();
+            } catch (JSONException ignored) {
+            }
+
+            String genre = "Not available";
+
+            try {
+                genre = mangaObject.getString("type");
+            } catch (JSONException ignored) {
+            }
+
+            String status = "Not available";
+
+            try {
+                status = attributes.getString("status");
+            } catch (JSONException ignored) {
+            }
+
+            String yearRelease = "Not available";
+
+            try {
+                yearRelease = attributes.getNumber("year").toString();
+            } catch (JSONException ignored) {
+            }
+
+            String description = "Not available";
 
             try {
                 description = attributes.getJSONObject("description")
-                        .getString("en");
+                        .getString("en").trim();
             } catch (JSONException ignored) {
             }
 
-            String coverPath = "";
+            String coverPath = "Not available";
 
             try {
                 coverPath = relationships.getJSONObject(relationships.length() - 1)
@@ -83,7 +120,7 @@ public class MangaDexApiHandling {
                     .thenAccept(MangaDexApiHandling::getMangaChapter)
                     .join();
 
-            mangaArray.add(new Manga(uuid, title, description, coverPath, chapterArray.get(i)));
+            mangaArray.add(new Manga(uuid, title, author, genre, status, yearRelease, description, coverPath, chapterArray.get(i)));
         }
     }
 
