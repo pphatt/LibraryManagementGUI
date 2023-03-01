@@ -40,34 +40,29 @@ public class MainLayoutGUI {
 
     public MainLayoutGUI() {
         GridBagConstraints constraints = new GridBagConstraints();
+
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.weightx = 1;
         constraints.weighty = 1;
         constraints.fill = GridBagConstraints.BOTH;
         constraints.anchor = GridBagConstraints.FIRST_LINE_START;
+
         Transition transition = new Transition();
         ContentScroll contentTable = new ContentScroll();
         transition.display(contentTable.contentScroll);
+
         contentLayout.add(transition, constraints);
 
-        homeButton.addActionListener(e -> {
-            JPanel panel = new JPanel();
-            panel.setLayout(new GridBagLayout());
-            panel.add(new JLabel("click"));
-
-            transition.display(panel);
-        });
+        homeButton.addActionListener(e -> transition.display(contentTable.contentScroll));
 
         addButton.addActionListener(e -> {
-//            contentScroll.setVisible(false);
+            AddBookGUI addBook = new AddBookGUI();
+            transition.display(addBook.mainLayout);
         });
 
-        quitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        quitButton.addActionListener(e -> {
 
-            }
         });
     }
 
