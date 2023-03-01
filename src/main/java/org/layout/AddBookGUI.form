@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="mainLayout" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="500" height="642"/>
+      <xy x="20" y="20" width="500" height="826"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -21,7 +21,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <grid id="6bb44" binding="titleField" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+              <grid id="6bb44" binding="titleLayout" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="5" left="5" bottom="5" right="5"/>
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -41,9 +41,17 @@
                     </constraints>
                     <properties/>
                   </component>
+                  <component id="3b063" class="javax.swing.JLabel" binding="warningTitle">
+                    <constraints>
+                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value=""/>
+                    </properties>
+                  </component>
                 </children>
               </grid>
-              <grid id="93125" binding="authorField" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+              <grid id="93125" binding="authorLayout" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="5" left="5" bottom="5" right="5"/>
                 <constraints>
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -63,9 +71,17 @@
                     </constraints>
                     <properties/>
                   </component>
+                  <component id="361c1" class="javax.swing.JLabel" binding="warningAuthor">
+                    <constraints>
+                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value=""/>
+                    </properties>
+                  </component>
                 </children>
               </grid>
-              <grid id="98b5c" binding="genreField" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+              <grid id="98b5c" binding="genreLayout" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="5" left="5" bottom="5" right="5"/>
                 <constraints>
                   <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -83,9 +99,17 @@
                     </constraints>
                     <properties/>
                   </component>
+                  <component id="b279b" class="javax.swing.JLabel" binding="warningGenre">
+                    <constraints>
+                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value=""/>
+                    </properties>
+                  </component>
                 </children>
               </grid>
-              <grid id="fd140" binding="statusField" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+              <grid id="fd140" binding="statusLayout" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="5" left="5" bottom="5" right="5"/>
                 <constraints>
                   <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -101,9 +125,17 @@
                     </constraints>
                     <properties/>
                   </component>
+                  <component id="25f08" class="javax.swing.JLabel" binding="warningStatus">
+                    <constraints>
+                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value=""/>
+                    </properties>
+                  </component>
                 </children>
               </grid>
-              <grid id="15875" binding="yearField" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+              <grid id="15875" binding="yearLayout" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="5" left="5" bottom="5" right="5"/>
                 <constraints>
                   <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -119,9 +151,17 @@
                     </constraints>
                     <properties/>
                   </component>
+                  <component id="98a93" class="javax.swing.JLabel" binding="warningYear">
+                    <constraints>
+                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value=""/>
+                    </properties>
+                  </component>
                 </children>
               </grid>
-              <grid id="edc91" binding="descriptionLayout" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+              <grid id="edc91" binding="descriptionLayout" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="5" left="5" bottom="5" right="5"/>
                 <constraints>
                   <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -141,9 +181,17 @@
                     </constraints>
                     <properties/>
                   </component>
+                  <component id="f9bc8" class="javax.swing.JLabel" binding="warningDescription">
+                    <constraints>
+                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value=""/>
+                    </properties>
+                  </component>
                 </children>
               </grid>
-              <grid id="84563" binding="chapterLayout" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+              <grid id="84563" binding="chapterLayout" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="5" left="5" bottom="5" right="5"/>
                 <constraints>
                   <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -162,6 +210,14 @@
                       </grid>
                     </constraints>
                     <properties/>
+                  </component>
+                  <component id="f2c28" class="javax.swing.JLabel" binding="warningChapter">
+                    <constraints>
+                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value=""/>
+                    </properties>
                   </component>
                 </children>
               </grid>

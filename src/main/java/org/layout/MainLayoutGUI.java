@@ -38,6 +38,14 @@ public class MainLayoutGUI {
      *
      * */
 
+    /*
+    * TODO:
+    *  - Row select edit and view
+    *  - Delete book
+    *  - Add Try Catch
+    *  - Search book
+    * */
+
     public MainLayoutGUI() {
         GridBagConstraints constraints = new GridBagConstraints();
 
