@@ -8,6 +8,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import static org.layout.APIHandleUtils.MangaDexApiHandling.mangaArray;
@@ -24,6 +26,9 @@ public class MainLayoutGUI {
     private JButton quitButton;
     private JPanel contentLayout;
     private JButton addDialogButton;
+    private JButton editButton;
+    private JButton deleteButton;
+    private ContentScroll contentTable;
 
     /*
      * Gridbaglayout Properties:
@@ -38,7 +43,7 @@ public class MainLayoutGUI {
      *  - Row select edit
      *  - Delete book
      *  - Add Try Catch
-     *  - Search book
+     *  - Advance Search if the book is not found in database, it will search on manga-dex
      *  - Next to search bar add a search option for title or author or type
      * */
 
@@ -53,7 +58,7 @@ public class MainLayoutGUI {
         constraints.anchor = GridBagConstraints.FIRST_LINE_START;
 
         Transition transition = new Transition();
-        ContentScroll contentTable = new ContentScroll(mangaArray);
+        contentTable = new ContentScroll(mangaArray);
         transition.display(contentTable.getScrollPane());
 
         contentLayout.add(transition, constraints);
@@ -91,6 +96,7 @@ public class MainLayoutGUI {
 
             public void renderTableOnSearch() {
                 if (searchField.getText().equals("")) {
+                    contentTable = new ContentScroll(mangaArray);
                     transition.display(contentTable.getScrollPane());
                 } else {
                     ArrayList<Manga> newMangaArray = new ArrayList<>();
@@ -101,10 +107,26 @@ public class MainLayoutGUI {
                         }
                     }
 
-                    ContentScroll newContentScroll = new ContentScroll(newMangaArray);
-                    transition.display(newContentScroll.getScrollPane());
+                    contentTable = new ContentScroll(newMangaArray);
+                    transition.display(contentTable.getScrollPane());
                 }
             }
+        });
+
+        editButton.addActionListener(e -> {
+            int index = contentTable.getTable().getSelectedRow();
+
+            String title = contentTable.getTable().getValueAt(index, 0).toString();
+            String author = contentTable.getTable().getValueAt(index, 1).toString();
+            String genre = contentTable.getTable().getValueAt(index, 2).toString();
+            String status = contentTable.getTable().getValueAt(index, 3).toString();
+            String yearRelease = contentTable.getTable().getValueAt(index, 4).toString();
+            String description = mangaArray.get(index).getDescription();
+            String chapter = contentTable.getTable().getValueAt(index, 5).toString();
+
+            EditBookGUI editBookGUI = new EditBookGUI(title, author, genre, status, yearRelease, description, chapter);
+            editBookGUI.setLocationRelativeTo(MainPanel);
+            editBookGUI.setVisible(true);
         });
     }
 

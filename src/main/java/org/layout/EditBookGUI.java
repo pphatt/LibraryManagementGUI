@@ -1,10 +1,13 @@
 package org.layout;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 
-public class T extends JDialog {
+public class EditBookGUI extends JDialog {
     private JPanel contentPane;
+    private JScrollPane mainLayout;
+    private JPanel layout;
     private JPanel editTitleLayout;
     private JTextField editTitleField;
     private JPanel editAuthorLayout;
@@ -16,31 +19,28 @@ public class T extends JDialog {
     private JPanel editYearLayout;
     private JTextField editYearField;
     private JPanel editDescriptionLayout;
-    private JTextField editDescriptionField;
+    private JTextArea editDescriptionField;
     private JPanel editChapterLayout;
-    private JPanel editChapterField;
+    private JTextField editChapterField;
     private JPanel buttonLayout;
     private JButton saveButton;
     private JButton cancelButton;
-    private JButton buttonOK;
-    private JButton buttonCancel;
 
-    public T() {
+    public EditBookGUI(String title, String author, String genre, String status, String year, String description, String chapter) {
         setContentPane(contentPane);
         setModal(true);
-        getRootPane().setDefaultButton(buttonOK);
+        getRootPane().setDefaultButton(cancelButton);
 
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
+        setTitle("Edit book: " + title);
+        setSize(new Dimension(800, 500));
 
-        buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+        editTitleField.setText(title);
+        editAuthorField.setText(author);
+        editGenreField.setText(genre);
+        editStatusField.setText(status);
+        editYearField.setText(year);
+        editDescriptionField.setText(description);
+        editChapterField.setText(chapter);
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -58,18 +58,13 @@ public class T extends JDialog {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    private void onOK() {
-        // add your code here
-        dispose();
-    }
-
     private void onCancel() {
         // add your code here if necessary
         dispose();
     }
 
 //    public static void main(String[] args) {
-//        T dialog = new T();
+//        EditBookGUI dialog = new EditBookGUI();
 //        dialog.pack();
 //        dialog.setVisible(true);
 //        System.exit(0);

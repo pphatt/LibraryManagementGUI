@@ -73,6 +73,10 @@ public class ContentScroll extends JPanel {
         return contentScroll;
     }
 
+    public JTable getTable() {
+        return contentTable;
+    }
+
 //    public static void main(String[] args) {
 //        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(10);
 //        JFrame frame = new JFrame("Register");
