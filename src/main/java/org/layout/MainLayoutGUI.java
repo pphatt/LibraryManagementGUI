@@ -1,17 +1,21 @@
 package org.layout;
 
+import org.layout.APIHandleUtils.Manga;
 import org.layout.APIHandleUtils.MangaDexApiHandling;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import static org.layout.APIHandleUtils.MangaDexApiHandling.mangaArray;
 
 public class MainLayoutGUI {
     private JPanel MainPanel;
     private JPanel headLayout;
-    private JTextField textField1;
+    private JTextField searchField;
     private JPanel mainLayout;
     private JPanel navLayout;
     private JPanel innerNavLayout;
@@ -30,12 +34,13 @@ public class MainLayoutGUI {
      * */
 
     /*
-    * TODO:
-    *  - Row select edit
-    *  - Delete book
-    *  - Add Try Catch
-    *  - Search book
-    * */
+     * TODO:
+     *  - Row select edit
+     *  - Delete book
+     *  - Add Try Catch
+     *  - Search book
+     *  - Next to search bar add a search option for title or author or type
+     * */
 
     public MainLayoutGUI() {
         GridBagConstraints constraints = new GridBagConstraints();
@@ -48,7 +53,7 @@ public class MainLayoutGUI {
         constraints.anchor = GridBagConstraints.FIRST_LINE_START;
 
         Transition transition = new Transition();
-        ContentScroll contentTable = new ContentScroll();
+        ContentScroll contentTable = new ContentScroll(mangaArray);
         transition.display(contentTable.getScrollPane());
 
         contentLayout.add(transition, constraints);
@@ -67,10 +72,44 @@ public class MainLayoutGUI {
             dialog.setLocationRelativeTo(MainPanel);
             dialog.setVisible(true);
         });
+
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                renderTableOnSearch();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                renderTableOnSearch();
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                renderTableOnSearch();
+            }
+
+            public void renderTableOnSearch() {
+                if (searchField.getText().equals("")) {
+                    transition.display(contentTable.getScrollPane());
+                } else {
+                    ArrayList<Manga> newMangaArray = new ArrayList<>();
+
+                    for (Manga manga : mangaArray) {
+                        if (manga.getTitle().toLowerCase().contains(searchField.getText().toLowerCase())) {
+                            newMangaArray.add(manga);
+                        }
+                    }
+
+                    ContentScroll newContentScroll = new ContentScroll(newMangaArray);
+                    transition.display(newContentScroll.getScrollPane());
+                }
+            }
+        });
     }
 
     public static void main(String[] args) {
-        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(50);
+        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(20);
         JFrame frame = new JFrame("Register");
 //        frame.setResizable(false);
         frame.setContentPane(new MainLayoutGUI().MainPanel);

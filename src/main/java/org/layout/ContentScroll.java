@@ -1,20 +1,18 @@
 package org.layout;
 
 import org.layout.APIHandleUtils.Manga;
-import org.layout.APIHandleUtils.MangaDexApiHandling;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-
-import static org.layout.APIHandleUtils.MangaDexApiHandling.mangaArray;
+import java.util.ArrayList;
 
 public class ContentScroll extends JPanel {
     private JScrollPane contentScroll;
     private JTable contentTable;
 
-    public ContentScroll() {
+    public ContentScroll(ArrayList<Manga> mangaArray) {
         DefaultTableModel model = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -75,13 +73,13 @@ public class ContentScroll extends JPanel {
         return contentScroll;
     }
 
-    public static void main(String[] args) {
-        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(10);
-        JFrame frame = new JFrame("Register");
-//        frame.setResizable(false);
-        frame.setContentPane(new ContentScroll().contentScroll);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
-    }
+//    public static void main(String[] args) {
+//        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(10);
+//        JFrame frame = new JFrame("Register");
+////        frame.setResizable(false);
+//        frame.setContentPane(new ContentScroll().contentScroll);
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        frame.pack();
+//        frame.setVisible(true);
+//    }
 }
