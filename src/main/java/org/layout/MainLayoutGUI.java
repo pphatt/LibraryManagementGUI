@@ -31,7 +31,7 @@ public class MainLayoutGUI {
 
     /*
     * TODO:
-    *  - Row select edit and view
+    *  - Row select edit
     *  - Delete book
     *  - Add Try Catch
     *  - Search book
@@ -49,15 +49,15 @@ public class MainLayoutGUI {
 
         Transition transition = new Transition();
         ContentScroll contentTable = new ContentScroll();
-        transition.display(contentTable.contentScroll);
+        transition.display(contentTable.getScrollPane());
 
         contentLayout.add(transition, constraints);
 
-        homeButton.addActionListener(e -> transition.display(contentTable.contentScroll));
+        homeButton.addActionListener(e -> transition.display(contentTable.getScrollPane()));
 
         addButton.addActionListener(e -> {
             AddBookGUI addBook = new AddBookGUI();
-            transition.display(addBook.mainLayout);
+            transition.display(addBook.getAddBookGUI());
         });
 
         quitButton.addActionListener(e -> System.exit(0));

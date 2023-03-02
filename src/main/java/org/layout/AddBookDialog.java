@@ -9,7 +9,7 @@ public class AddBookDialog extends JDialog {
     private JButton cancelButton;
 
     public AddBookDialog() {
-        setContentPane(new AddBookGUI().mainLayout);
+        setContentPane(new AddBookGUI().getAddBookGUI());
         setModal(true);
         setTitle("Add Book");
         setSize(new Dimension(500, 700));

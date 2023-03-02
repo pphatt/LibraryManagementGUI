@@ -10,7 +10,7 @@ import java.awt.event.FocusEvent;
 import static org.layout.APIHandleUtils.MangaDexApiHandling.mangaArray;
 
 public class AddBookGUI {
-    public JPanel mainLayout;
+    private JPanel mainLayout;
     private JPanel layout;
     private JPanel titleLayout;
     private JTextField titleInput;
@@ -75,5 +75,9 @@ public class AddBookGUI {
         cancelButton.addActionListener(e -> {
 
         });
+    }
+
+    public JPanel getAddBookGUI() {
+        return mainLayout;
     }
 }

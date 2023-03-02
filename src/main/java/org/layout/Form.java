@@ -32,7 +32,7 @@ public class Form {
         MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(5);
         Transition transition = new Transition();
 
-        transition.display(new ContentScroll().contentScroll);
+        transition.display(new ContentScroll().getScrollPane());
         panel1.add(transition);
 
         button1.addActionListener(new ActionListener() {

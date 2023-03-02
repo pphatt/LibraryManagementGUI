@@ -11,7 +11,7 @@ import javax.swing.table.TableColumnModel;
 import static org.layout.APIHandleUtils.MangaDexApiHandling.mangaArray;
 
 public class ContentScroll extends JPanel {
-    public JScrollPane contentScroll;
+    private JScrollPane contentScroll;
     private JTable contentTable;
 
     public ContentScroll() {
@@ -69,6 +69,10 @@ public class ContentScroll extends JPanel {
             viewDetailsDialog.setLocationRelativeTo(contentScroll);
             viewDetailsDialog.setVisible(true);
         });
+    }
+
+    public JScrollPane getScrollPane() {
+        return contentScroll;
     }
 
     public static void main(String[] args) {
