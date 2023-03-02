@@ -51,7 +51,23 @@ public class ContentScroll extends JPanel {
 
         cellSelectionModel.addListSelectionListener(e -> {
             int selectedRow = contentTable.getSelectedRow();
-            String selectedData = (String) contentTable.getValueAt(selectedRow, 0);
+            String title = (String) contentTable.getValueAt(selectedRow, 0);
+            String author = (String) contentTable.getValueAt(selectedRow, 1);
+            String genre = (String) contentTable.getValueAt(selectedRow, 2);
+            String status = (String) contentTable.getValueAt(selectedRow, 3);
+            String yearRelease = (String) contentTable.getValueAt(selectedRow, 4);
+            String description = mangaArray.get(selectedRow).getDescription();
+            String chapter = contentTable.getValueAt(selectedRow, 5).toString();
+
+            /*
+            * TODO:
+            *  - Just need to add a dialog and if I forget just look at the MainLayout - Add book gui and anything related to it
+            *  - Just sleep.... You need more sleep
+            * */
+
+            ViewDetailsBook viewDetailsDialog = new ViewDetailsBook(title, author, genre, status, yearRelease, description, chapter);
+            viewDetailsDialog.setLocationRelativeTo(contentScroll);
+            viewDetailsDialog.setVisible(true);
         });
     }
 

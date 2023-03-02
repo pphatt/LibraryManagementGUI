@@ -4,6 +4,8 @@ import org.layout.APIHandleUtils.MangaDexApiHandling;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
@@ -43,6 +45,17 @@ public class Test1 {
                 super.focusLost(e);
                 test.setBackground(null);
                 test.setBorder(null);
+            }
+        });
+
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                T a = new T();
+                a.setSize(200,200);
+                a.setLocationRelativeTo(panel1);
+//                a.setLocationRelativeTo(null);
+                a.setVisible(true);
             }
         });
     }

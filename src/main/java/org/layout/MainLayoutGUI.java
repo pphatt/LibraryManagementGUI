@@ -1,20 +1,12 @@
 package org.layout;
 
-import org.layout.APIHandleUtils.Manga;
 import org.layout.APIHandleUtils.MangaDexApiHandling;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import static org.layout.APIHandleUtils.MangaDexApiHandling.mangaArray;
 
 public class MainLayoutGUI {
     private JPanel MainPanel;
@@ -27,8 +19,7 @@ public class MainLayoutGUI {
     private JButton addButton;
     private JButton quitButton;
     private JPanel contentLayout;
-    private JTable contentTable;
-    private JScrollPane contentScroll;
+    private JButton addDialogButton;
 
     /*
      * Gridbaglayout Properties:
@@ -69,13 +60,17 @@ public class MainLayoutGUI {
             transition.display(addBook.mainLayout);
         });
 
-        quitButton.addActionListener(e -> {
+        quitButton.addActionListener(e -> System.exit(0));
 
+        addDialogButton.addActionListener(e -> {
+            AddBookDialog dialog = new AddBookDialog();
+            dialog.setLocationRelativeTo(MainPanel);
+            dialog.setVisible(true);
         });
     }
 
     public static void main(String[] args) {
-        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(5);
+        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(50);
         JFrame frame = new JFrame("Register");
 //        frame.setResizable(false);
         frame.setContentPane(new MainLayoutGUI().MainPanel);
