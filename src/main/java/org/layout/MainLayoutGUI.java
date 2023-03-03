@@ -40,12 +40,12 @@ public class MainLayoutGUI {
 
     /*
      * TODO:
-     *  - Row select edit (almost done)
+     *  - Row select edit (CHECKED)
      *  - Delete book
      *  - Add Try Catch
      *  - Advance Search if the book is not found in database, it will search on manga-dex
      *  - Next to search bar add a search option for title or author or type
-     *  - Fix edit warning messages and change status, genre, year field to combo box.
+     *  - Fix edit warning messages and change status, genre, year field to combo box. (CHECKED)
      *  -
      *  -
      *  -
@@ -139,11 +139,30 @@ public class MainLayoutGUI {
             contentTable = new ContentScroll(mangaArray);
             transition.display(contentTable.getScrollPane());
         });
+
+        deleteButton.addActionListener(e -> {
+            int index = contentTable.getTable().getSelectedRow();
+
+            String title = contentTable.getTable().getValueAt(index, 0).toString();
+            String author = contentTable.getTable().getValueAt(index, 1).toString();
+            String genre = contentTable.getTable().getValueAt(index, 2).toString();
+            String status = contentTable.getTable().getValueAt(index, 3).toString();
+            String yearRelease = contentTable.getTable().getValueAt(index, 4).toString();
+            String description = mangaArray.get(index).getDescription();
+            String chapter = contentTable.getTable().getValueAt(index, 5).toString();
+
+            DeleteBookDialog deleteBookDialog = new DeleteBookDialog(index, title, author, genre, status, yearRelease, description, chapter);
+            deleteBookDialog.setLocationRelativeTo(MainPanel);
+            deleteBookDialog.setVisible(true);
+
+            contentTable = new ContentScroll(mangaArray);
+            transition.display(contentTable.getScrollPane());
+        });
     }
 
     public static void main(String[] args) {
         MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(20);
-        JFrame frame = new JFrame("Register");
+        JFrame frame = new JFrame("Library Management");
 //        frame.setResizable(false);
         frame.setContentPane(new MainLayoutGUI().MainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
