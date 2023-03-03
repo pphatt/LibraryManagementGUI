@@ -84,6 +84,9 @@ public class MainLayoutGUI {
             AddBookDialog dialog = new AddBookDialog();
             dialog.setLocationRelativeTo(MainPanel);
             dialog.setVisible(true);
+
+            contentTable = new ContentScroll(mangaArray);
+            transition.display(contentTable.getScrollPane());
         });
 
         searchField.getDocument().addDocumentListener(new DocumentListener() {
