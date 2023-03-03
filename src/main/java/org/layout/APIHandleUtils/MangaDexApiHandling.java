@@ -96,7 +96,7 @@ public class MangaDexApiHandling {
 
             try {
                 description = attributes.getJSONObject("description")
-                        .getString("en").trim();
+                        .getString("en").trim().replaceAll("\n", " ");
             } catch (JSONException ignored) {
             }
 

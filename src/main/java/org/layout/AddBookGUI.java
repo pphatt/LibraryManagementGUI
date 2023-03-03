@@ -3,6 +3,9 @@ package org.layout;
 import org.layout.APIHandleUtils.Manga;
 
 import javax.swing.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -121,6 +124,18 @@ public class AddBookGUI {
                     Objects.requireNonNull(statusCombobox.getSelectedItem()).toString(),
                     Objects.requireNonNull(yearCombobox.getSelectedItem()).toString(),
                     descriptionTextArea.getText(), "Not available", chapter));
+
+            try(BufferedWriter data = new BufferedWriter(new FileWriter("book-data.txt", true))) {
+                data.write(UUID.randomUUID() + ";");
+                data.write(titleInput.getText() + ";");
+                data.write(authorInput.getText() + ";");
+                data.write(genreCombobox.getSelectedItem().toString() + ";");
+                data.write(statusCombobox.getSelectedItem().toString() + ";");
+                data.write(yearCombobox.getSelectedItem().toString() + ";");
+                data.write(descriptionTextArea.getText().trim().replaceAll("\n", " ") + ";");
+                data.write(chapterInput.getText() + System.lineSeparator());
+            } catch (IOException ignored) {
+            }
 
             titleInput.setText("");
             authorInput.setText("");
