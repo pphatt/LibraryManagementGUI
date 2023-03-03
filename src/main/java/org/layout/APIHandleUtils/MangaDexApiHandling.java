@@ -60,8 +60,6 @@ public class MangaDexApiHandling {
             } catch (JSONException ignored) {
             }
 
-            System.out.println(title);
-
             String author = "Not available";
 
             try {
@@ -96,7 +94,9 @@ public class MangaDexApiHandling {
 
             try {
                 description = attributes.getJSONObject("description")
-                        .getString("en").trim().replaceAll("\n", " ");
+                        .getString("en")
+                        .trim()
+                        .replaceAll("(\n|\r\n|;)", " ");
             } catch (JSONException ignored) {
             }
 

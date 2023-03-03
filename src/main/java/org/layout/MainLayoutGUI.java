@@ -42,8 +42,8 @@ public class MainLayoutGUI {
     /*
      * TODO:
      *  - Row select edit (CHECKED)
-     *  - Delete book
-     *  - Add Try Catch
+     *  - Delete book (CHECKED)
+     *  - Add Try Catch (almost)
      *  - Advance Search if the book is not found in database, it will search on manga-dex
      *  - Next to search bar add a search option for title or author or type
      *  - Fix edit warning messages and change status, genre, year field to combo box. (CHECKED)
@@ -221,15 +221,14 @@ public class MainLayoutGUI {
             }
 
             return arr;
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+        } catch (IOException ignored) {
         }
 
-        return null;
+        return new ArrayList<>();
     }
 
     public static void main(String[] args) {
-        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(20);
+        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(60);
         JFrame frame = new JFrame("Library Management");
 //        frame.setResizable(false);
         frame.setContentPane(new MainLayoutGUI().MainPanel);

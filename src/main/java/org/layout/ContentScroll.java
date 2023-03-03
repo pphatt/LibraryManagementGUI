@@ -29,7 +29,6 @@ public class ContentScroll extends JPanel {
         model.addColumn("Year Release");
         model.addColumn("Chapter");
 
-        contentTable.setModel(model);
         contentTable.getTableHeader().setReorderingAllowed(false);
 
         for (Manga manga : mangaArray) {
@@ -56,12 +55,6 @@ public class ContentScroll extends JPanel {
             String yearRelease = (String) contentTable.getValueAt(selectedRow, 4);
             String description = mangaArray.get(selectedRow).getDescription();
             String chapter = contentTable.getValueAt(selectedRow, 5).toString();
-
-            /*
-            * TODO:
-            *  - Just need to add a dialog and if I forget just look at the MainLayout - Add book gui and anything related to it
-            *  - Just sleep.... You need more sleep
-            * */
 
             ViewDetailsBook viewDetailsDialog = new ViewDetailsBook(title, author, genre, status, yearRelease, description, chapter);
             viewDetailsDialog.setLocationRelativeTo(contentScroll);
