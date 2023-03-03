@@ -40,11 +40,16 @@ public class MainLayoutGUI {
 
     /*
      * TODO:
-     *  - Row select edit
+     *  - Row select edit (almost done)
      *  - Delete book
      *  - Add Try Catch
      *  - Advance Search if the book is not found in database, it will search on manga-dex
      *  - Next to search bar add a search option for title or author or type
+     *  - Fix edit warning messages and change status, genre, year field to combo box.
+     *  -
+     *  -
+     *  -
+     *  - You need more sleep... Brother....
      * */
 
     public MainLayoutGUI() {
@@ -63,7 +68,10 @@ public class MainLayoutGUI {
 
         contentLayout.add(transition, constraints);
 
-        homeButton.addActionListener(e -> transition.display(contentTable.getScrollPane()));
+        homeButton.addActionListener(e -> {
+            contentTable = new ContentScroll(mangaArray);
+            transition.display(contentTable.getScrollPane());
+        });
 
         addButton.addActionListener(e -> {
             AddBookGUI addBook = new AddBookGUI();
@@ -124,9 +132,12 @@ public class MainLayoutGUI {
             String description = mangaArray.get(index).getDescription();
             String chapter = contentTable.getTable().getValueAt(index, 5).toString();
 
-            EditBookGUI editBookGUI = new EditBookGUI(title, author, genre, status, yearRelease, description, chapter);
+            EditBookGUI editBookGUI = new EditBookGUI(index, title, author, genre, status, yearRelease, description, chapter);
             editBookGUI.setLocationRelativeTo(MainPanel);
             editBookGUI.setVisible(true);
+
+            contentTable = new ContentScroll(mangaArray);
+            transition.display(contentTable.getScrollPane());
         });
     }
 

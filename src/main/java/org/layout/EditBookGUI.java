@@ -3,6 +3,9 @@ package org.layout;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Objects;
+
+import static org.layout.APIHandleUtils.MangaDexApiHandling.mangaArray;
 
 public class EditBookGUI extends JDialog {
     private JPanel contentPane;
@@ -13,11 +16,11 @@ public class EditBookGUI extends JDialog {
     private JPanel editAuthorLayout;
     private JTextField editAuthorField;
     private JPanel editGenreLayout;
-    private JTextField editGenreField;
+    private JComboBox<String> editGenreCombobox;
     private JPanel editStatusLayout;
-    private JTextField editStatusField;
+    private JComboBox<String> editStatusCombobox;
     private JPanel editYearLayout;
-    private JTextField editYearField;
+    private JComboBox<String> editYearCombobox;
     private JPanel editDescriptionLayout;
     private JTextArea editDescriptionField;
     private JPanel editChapterLayout;
@@ -25,8 +28,15 @@ public class EditBookGUI extends JDialog {
     private JPanel buttonLayout;
     private JButton saveButton;
     private JButton cancelButton;
+    private JLabel warningTitleField;
+    private JLabel warningAuthorField;
+    private JLabel warningGenreField;
+    private JLabel warningStatusField;
+    private JLabel warningYearField;
+    private JLabel warningDescriptionField;
+    private JLabel warningChapterField;
 
-    public EditBookGUI(String title, String author, String genre, String status, String year, String description, String chapter) {
+    public EditBookGUI(int index, String title, String author, String genre, String status, String year, String description, String chapter) {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(cancelButton);
@@ -34,11 +44,56 @@ public class EditBookGUI extends JDialog {
         setTitle("Edit book: " + title);
         setSize(new Dimension(800, 500));
 
+        String[] genreItem = {"manga", "science", "adventure", "slice of life"};
+        String[] statusItem = {"ongoing", "completed", "hiatus", "cancelled"};
+        String[] yearItem = new String[23];
+
+        for (int i = 0; i < yearItem.length; i++) {
+            yearItem[i] = 2000 + yearItem.length - i - 1 + "";
+        }
+
         editTitleField.setText(title);
         editAuthorField.setText(author);
-        editGenreField.setText(genre);
-        editStatusField.setText(status);
-        editYearField.setText(year);
+
+        DefaultComboBoxModel<String> genreComboboxModel = new DefaultComboBoxModel<>(genreItem);
+        int getCurrentGenreIndex = 0;
+
+        for (int i = 0; i < genreItem.length; i++) {
+            if (genreItem[i].equals(genre)) {
+                getCurrentGenreIndex = i;
+                break;
+            }
+        }
+
+        editGenreCombobox.setModel(genreComboboxModel);
+        editGenreCombobox.setSelectedIndex(getCurrentGenreIndex);
+
+        DefaultComboBoxModel<String> statusComboboxModel = new DefaultComboBoxModel<>(statusItem);
+        int getCurrentStatusIndex = 0;
+
+        for (int i = 0; i < statusItem.length; i++) {
+            if (statusItem[i].equals(status)) {
+                getCurrentStatusIndex = i;
+                break;
+            }
+        }
+
+        editStatusCombobox.setModel(statusComboboxModel);
+        editStatusCombobox.setSelectedIndex(getCurrentStatusIndex);
+
+        DefaultComboBoxModel<String> yearComboboxModel = new DefaultComboBoxModel<>(yearItem);
+        int getCurrentYearIndex = 0;
+
+        for (int i = 0; i < yearItem.length; i++) {
+            if (yearItem[i].equals(year)) {
+                getCurrentYearIndex = i;
+                break;
+            }
+        }
+
+        editYearCombobox.setModel(yearComboboxModel);
+        editYearCombobox.setSelectedIndex(getCurrentYearIndex);
+
         editDescriptionField.setText(description);
         editChapterField.setText(chapter);
 
@@ -51,11 +106,67 @@ public class EditBookGUI extends JDialog {
         });
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
+        contentPane.registerKeyboardAction(e -> onCancel(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        saveButton.addActionListener(e -> {
+            warningTitleField.setVisible(false);
+            warningAuthorField.setVisible(false);
+            warningChapterField.setVisible(false);
+
+            if (editTitleField.getText().equals("")) {
+                warningTitleField.setVisible(true);
+                warningTitleField.setText("* Title field must not be empty");
+                return;
+            } else if (editTitleField.getText().length() > 256) {
+                warningTitleField.setVisible(true);
+                warningTitleField.setText("* Title max characters is 256");
+                return;
             }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+            if (editAuthorField.getText().equals("")) {
+                warningAuthorField.setVisible(true);
+                warningAuthorField.setText("* Author field must not be empty");
+                return;
+            } else if (editAuthorField.getText().length() > 256) {
+                warningAuthorField.setVisible(true);
+                warningAuthorField.setText("* Author max characters is 256");
+                return;
+            }
+
+            int newChapter;
+
+            if (editChapterField.getText().equals("")) {
+                warningChapterField.setVisible(true);
+                warningChapterField.setText("* Chapter field must not be empty");
+                return;
+            } else {
+                try {
+                    newChapter = Integer.parseInt(editChapterField.getText());
+                } catch (NumberFormatException ignored) {
+                    warningChapterField.setVisible(true);
+                    warningChapterField.setText("* Chapter field must be a number");
+                    editChapterField.setText("");
+                    return;
+                }
+            }
+
+            mangaArray.get(index).setTitle(title);
+            mangaArray.get(index).setAuthor(author);
+            mangaArray.get(index).setGenre(Objects.requireNonNull(editGenreCombobox.getSelectedItem()).toString());
+            mangaArray.get(index).setStatus(Objects.requireNonNull(editStatusCombobox.getSelectedItem()).toString());
+            mangaArray.get(index).setYearRelease(Objects.requireNonNull(editYearCombobox.getSelectedItem()).toString());
+            mangaArray.get(index).setDescription(description);
+            mangaArray.get(index).setChapters(newChapter);
+
+            JOptionPane.showMessageDialog(mainLayout,
+                    "Edited Successfully", "Notify message",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            onCancel();
+        });
+
+        cancelButton.addActionListener(e -> onCancel());
     }
 
     private void onCancel() {

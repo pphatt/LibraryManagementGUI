@@ -93,7 +93,7 @@
                   <color color="-6840403"/>
                 </border>
                 <children>
-                  <component id="fdd8c" class="javax.swing.JComboBox" binding="authorCombobox">
+                  <component id="fdd8c" class="javax.swing.JComboBox" binding="genreCombobox">
                     <constraints>
                       <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
