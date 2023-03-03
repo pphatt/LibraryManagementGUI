@@ -151,12 +151,12 @@ public class EditBookGUI extends JDialog {
                 }
             }
 
-            mangaArray.get(index).setTitle(title);
-            mangaArray.get(index).setAuthor(author);
+            mangaArray.get(index).setTitle(editTitleField.getText());
+            mangaArray.get(index).setAuthor(editAuthorField.getText());
             mangaArray.get(index).setGenre(Objects.requireNonNull(editGenreCombobox.getSelectedItem()).toString());
             mangaArray.get(index).setStatus(Objects.requireNonNull(editStatusCombobox.getSelectedItem()).toString());
             mangaArray.get(index).setYearRelease(Objects.requireNonNull(editYearCombobox.getSelectedItem()).toString());
-            mangaArray.get(index).setDescription(description);
+            mangaArray.get(index).setDescription(editDescriptionField.getText().trim().replaceAll("\n", " "));
             mangaArray.get(index).setChapters(newChapter);
 
             JOptionPane.showMessageDialog(mainLayout,
