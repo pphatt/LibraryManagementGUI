@@ -8,12 +8,10 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
 
-import static org.layout.APIHandleUtils.MangaDexApiHandling.mangaArray;
+import static org.layout.APIHandleUtils.MangaDexApiHandling.*;
 
 public class MainLayoutGUI {
     private JPanel MainPanel;
@@ -54,6 +52,9 @@ public class MainLayoutGUI {
      * */
 
     public MainLayoutGUI() {
+        Transition transition = new Transition();
+        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(100);
+
         ArrayList<Manga> a = readData();
 
         for (int i = 0; i < a.size(); i++) {
@@ -82,9 +83,7 @@ public class MainLayoutGUI {
         constraints.fill = GridBagConstraints.BOTH;
         constraints.anchor = GridBagConstraints.FIRST_LINE_START;
 
-        Transition transition = new Transition();
-        contentTable = new ContentScroll(mangaArray);
-        transition.display(contentTable.getScrollPane());
+        transition.display(mangaDexApiHandling.getUpdateScrollPane().getScrollPane());
 
         contentLayout.add(transition, constraints);
 
@@ -187,7 +186,7 @@ public class MainLayoutGUI {
         quitButton.addActionListener(e -> System.exit(0));
     }
 
-    public void reWriteEntireData(ArrayList<Manga> array) {
+    public static void reWriteEntireData(ArrayList<Manga> array) {
         try (FileWriter fstream = new FileWriter("book-data.txt")) {
             BufferedWriter data = new BufferedWriter(fstream);
 
@@ -208,7 +207,7 @@ public class MainLayoutGUI {
         }
     }
 
-    public ArrayList<Manga> readData() {
+    public static ArrayList<Manga> readData() {
         try (BufferedReader br = new BufferedReader(new FileReader("book-data.txt"))) {
             ArrayList<Manga> arr = new ArrayList<>();
             String line = br.readLine();
@@ -228,7 +227,6 @@ public class MainLayoutGUI {
     }
 
     public static void main(String[] args) {
-        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(60);
         JFrame frame = new JFrame("Library Management");
 //        frame.setResizable(false);
         frame.setContentPane(new MainLayoutGUI().MainPanel);
