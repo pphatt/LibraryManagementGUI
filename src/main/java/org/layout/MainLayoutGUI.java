@@ -28,7 +28,7 @@ public class MainLayoutGUI {
     private JButton editButton;
     private JButton deleteButton;
     private JComboBox<String> optionSearchCombobox;
-    private ContentScroll contentTable;
+    public static ContentScroll contentTable = new ContentScroll(mangaArray);
 
     /*
      * Gridbaglayout Properties:
@@ -65,7 +65,7 @@ public class MainLayoutGUI {
         constraints.fill = GridBagConstraints.BOTH;
         constraints.anchor = GridBagConstraints.FIRST_LINE_START;
 
-        transition.display(mangaDexApiHandling.getUpdateScrollPane().getScrollPane());
+        transition.display(contentTable.getScrollPane());
         contentLayout.add(transition, constraints);
 
         String[] options = {"Title", "Author", "Genre", "Status"};
@@ -73,6 +73,10 @@ public class MainLayoutGUI {
         optionSearchCombobox.setModel(optionModel);
 
         homeButton.addActionListener(e -> {
+            if (!state) {
+                return;
+            }
+
             contentTable = new ContentScroll(mangaArray);
             transition.display(contentTable.getScrollPane());
         });
@@ -108,6 +112,10 @@ public class MainLayoutGUI {
             }
 
             public void renderTableOnSearch() {
+                if (!state) {
+                    return;
+                }
+
                 String option = (String) optionSearchCombobox.getSelectedItem();
 
                 assert option != null;
@@ -182,6 +190,14 @@ public class MainLayoutGUI {
         editButton.addActionListener(e -> {
             int index = contentTable.getTable().getSelectedRow();
 
+            if (index == -1) {
+                JOptionPane.showMessageDialog(mainLayout,
+                        "Invalid Book. You have to select a book to edit", "Notify message",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                return;
+            }
+
             String title = contentTable.getTable().getValueAt(index, 0).toString();
             String author = contentTable.getTable().getValueAt(index, 1).toString();
             String genre = contentTable.getTable().getValueAt(index, 2).toString();
@@ -202,6 +218,14 @@ public class MainLayoutGUI {
 
         deleteButton.addActionListener(e -> {
             int index = contentTable.getTable().getSelectedRow();
+
+            if (index == -1) {
+                JOptionPane.showMessageDialog(mainLayout,
+                        "Invalid Book. You have to select a book to delete", "Notify message",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                return;
+            }
 
             String title = contentTable.getTable().getValueAt(index, 0).toString();
             String author = contentTable.getTable().getValueAt(index, 1).toString();

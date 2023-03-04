@@ -3,7 +3,6 @@ package org.layout.APIHandleUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.layout.ContentScroll;
 import org.layout.MainLayoutGUI;
 
 import javax.swing.table.DefaultTableModel;
@@ -13,12 +12,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Objects;
 
 public class MangaDexApiHandling {
     public static ArrayList<Manga> mangaArray = new ArrayList<>();
     public static ArrayList<Integer> chapterArray = new ArrayList<>();
-    public static ContentScroll scrollPaneContent = new ContentScroll(mangaArray);
+    public static boolean state = false;
 
     public MangaDexApiHandling(int amount) {
         HttpClient client = HttpClient.newHttpClient();
@@ -34,7 +32,7 @@ public class MangaDexApiHandling {
     }
 
     public static void getManga(String responseBody) {
-        DefaultTableModel a = (DefaultTableModel) scrollPaneContent.getTable().getModel();
+        DefaultTableModel a = (DefaultTableModel) MainLayoutGUI.contentTable.getTable().getModel();
         ArrayList<Manga> ab = MainLayoutGUI.readData();
         JSONObject jsonObject = new JSONObject(responseBody);
         JSONArray mangas = new JSONArray(jsonObject.getJSONArray("data"));
@@ -115,7 +113,7 @@ public class MangaDexApiHandling {
                     .join();
 
             a.addRow(new Object[]{title, author, genre, status, yearRelease, chapterArray.get(i)});
-            scrollPaneContent.getTable().setModel(a);
+            MainLayoutGUI.contentTable.getTable().setModel(a);
 
             mangaArray.add(new Manga(uuid, title, author, genre, status, yearRelease, description, coverPath, chapterArray.get(i)));
         }
@@ -134,16 +132,13 @@ public class MangaDexApiHandling {
                 if (c) {
                     mangaArray.add(value);
                     a.addRow(new Object[]{value.getTitle(), value.getAuthor(), value.getGenre(), value.getStatus(), value.getYearRelease(), value.getChapters()});
-                    scrollPaneContent.getTable().setModel(a);
+                    MainLayoutGUI.contentTable.getTable().setModel(a);
                 }
             }
         }
 
         MainLayoutGUI.reWriteEntireData(mangaArray);
-    }
-
-    public ContentScroll getUpdateScrollPane() {
-        return scrollPaneContent;
+        state = true;
     }
 
     public static void getMangaChapter(String responseBody) {
