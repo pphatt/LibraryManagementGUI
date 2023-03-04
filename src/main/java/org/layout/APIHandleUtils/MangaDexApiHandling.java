@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.layout.ContentScroll;
+import org.layout.MainLayoutGUI;
 
 import javax.swing.table.DefaultTableModel;
 import java.net.URI;
@@ -12,6 +13,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class MangaDexApiHandling {
     public static ArrayList<Manga> mangaArray = new ArrayList<>();
@@ -32,6 +34,8 @@ public class MangaDexApiHandling {
     }
 
     public static void getManga(String responseBody) {
+        DefaultTableModel a = (DefaultTableModel) scrollPaneContent.getTable().getModel();
+        ArrayList<Manga> ab = MainLayoutGUI.readData();
         JSONObject jsonObject = new JSONObject(responseBody);
         JSONArray mangas = new JSONArray(jsonObject.getJSONArray("data"));
 
@@ -110,31 +114,32 @@ public class MangaDexApiHandling {
                     .thenAccept(MangaDexApiHandling::getMangaChapter)
                     .join();
 
-            DefaultTableModel a = (DefaultTableModel) scrollPaneContent.getTable().getModel();
             a.addRow(new Object[]{title, author, genre, status, yearRelease, chapterArray.get(i)});
             scrollPaneContent.getTable().setModel(a);
 
             mangaArray.add(new Manga(uuid, title, author, genre, status, yearRelease, description, coverPath, chapterArray.get(i)));
         }
 
-//        ArrayList<Manga> ab = MainLayoutGUI.readData();
-//
-//        for (int i = 0; i < ab.size(); i++) {
-//            boolean c = true;
-//
-//            for (int j = 0; j < mangaArray.size(); j++) {
-//                if (mangaArray.get(j).getUuid().equals(ab.get(i).getUuid())) {
-//                    c = false;
-//                    break;
-//                }
-//            }
-//
-//            if (c) {
-//                mangaArray.add(ab.get(i));
-//            }
-//        }
-//
-//        MainLayoutGUI.reWriteEntireData(mangaArray);
+        if (ab != null) {
+            for (Manga value : ab) {
+                boolean c = true;
+
+                for (Manga manga : mangaArray) {
+                    if (manga.getUuid().equals(value.getUuid())) {
+                        c = false;
+                        break;
+                    }
+                }
+
+                if (c) {
+                    mangaArray.add(value);
+                    a.addRow(new Object[]{value.getTitle(), value.getAuthor(), value.getGenre(), value.getStatus(), value.getYearRelease(), value.getChapters()});
+                    scrollPaneContent.getTable().setModel(a);
+                }
+            }
+        }
+
+        MainLayoutGUI.reWriteEntireData(mangaArray);
     }
 
     public ContentScroll getUpdateScrollPane() {

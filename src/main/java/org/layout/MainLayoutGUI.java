@@ -53,26 +53,7 @@ public class MainLayoutGUI {
 
     public MainLayoutGUI() {
         Transition transition = new Transition();
-        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(100);
-
-        ArrayList<Manga> a = readData();
-
-        for (int i = 0; i < a.size(); i++) {
-            boolean c = true;
-
-            for (int j = 0; j < mangaArray.size(); j++) {
-                if (mangaArray.get(j).getUuid().equals(a.get(i).getUuid())) {
-                    c = false;
-                    break;
-                }
-            }
-
-            if (c) {
-                mangaArray.add(a.get(i));
-            }
-        }
-
-        reWriteEntireData(mangaArray);
+        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(10);
 
         GridBagConstraints constraints = new GridBagConstraints();
 
@@ -223,7 +204,7 @@ public class MainLayoutGUI {
         } catch (IOException ignored) {
         }
 
-        return new ArrayList<>();
+        return null;
     }
 
     public static void main(String[] args) {
