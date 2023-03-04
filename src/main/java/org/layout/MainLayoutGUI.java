@@ -27,6 +27,7 @@ public class MainLayoutGUI {
     private JButton addDialogButton;
     private JButton editButton;
     private JButton deleteButton;
+    private JComboBox<String> optionSearchCombobox;
     private ContentScroll contentTable;
 
     /*
@@ -43,7 +44,7 @@ public class MainLayoutGUI {
      *  - Delete book (CHECKED)
      *  - Add Try Catch (almost)
      *  - Advance Search if the book is not found in database, it will search on manga-dex
-     *  - Next to search bar add a search option for title or author or type
+     *  - Next to search bar add a search option for title or author or type (CHECKED)
      *  - Fix edit warning messages and change status, genre, year field to combo box. (CHECKED)
      *  -
      *  -
@@ -53,7 +54,7 @@ public class MainLayoutGUI {
 
     public MainLayoutGUI() {
         Transition transition = new Transition();
-        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(10);
+        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(100);
 
         GridBagConstraints constraints = new GridBagConstraints();
 
@@ -65,8 +66,11 @@ public class MainLayoutGUI {
         constraints.anchor = GridBagConstraints.FIRST_LINE_START;
 
         transition.display(mangaDexApiHandling.getUpdateScrollPane().getScrollPane());
-
         contentLayout.add(transition, constraints);
+
+        String[] options = {"Title", "Author", "Genre", "Status"};
+        DefaultComboBoxModel<String> optionModel = new DefaultComboBoxModel<>(options);
+        optionSearchCombobox.setModel(optionModel);
 
         homeButton.addActionListener(e -> {
             contentTable = new ContentScroll(mangaArray);
@@ -104,20 +108,73 @@ public class MainLayoutGUI {
             }
 
             public void renderTableOnSearch() {
-                if (searchField.getText().equals("")) {
-                    contentTable = new ContentScroll(mangaArray);
-                    transition.display(contentTable.getScrollPane());
-                } else {
-                    ArrayList<Manga> newMangaArray = new ArrayList<>();
+                String option = (String) optionSearchCombobox.getSelectedItem();
 
-                    for (Manga manga : mangaArray) {
-                        if (manga.getTitle().toLowerCase().contains(searchField.getText().toLowerCase())) {
-                            newMangaArray.add(manga);
+                assert option != null;
+                if (option.equals("Title")) {
+                    if (searchField.getText().equals("")) {
+                        contentTable = new ContentScroll(mangaArray);
+                        transition.display(contentTable.getScrollPane());
+                    } else {
+                        ArrayList<Manga> newMangaArray = new ArrayList<>();
+
+                        for (Manga manga : mangaArray) {
+                            if (manga.getTitle().toLowerCase().contains(searchField.getText().toLowerCase())) {
+                                newMangaArray.add(manga);
+                            }
                         }
-                    }
 
-                    contentTable = new ContentScroll(newMangaArray);
-                    transition.display(contentTable.getScrollPane());
+                        contentTable = new ContentScroll(newMangaArray);
+                        transition.display(contentTable.getScrollPane());
+                    }
+                } else if (option.equals("Author")) {
+                    if (searchField.getText().equals("")) {
+                        contentTable = new ContentScroll(mangaArray);
+                        transition.display(contentTable.getScrollPane());
+                    } else {
+                        ArrayList<Manga> newMangaArray = new ArrayList<>();
+
+                        for (Manga manga : mangaArray) {
+                            if (manga.getAuthor().toLowerCase().contains(searchField.getText().toLowerCase())) {
+                                newMangaArray.add(manga);
+                            }
+                        }
+
+                        contentTable = new ContentScroll(newMangaArray);
+                        transition.display(contentTable.getScrollPane());
+                    }
+                } else if (option.equals("Genre")) {
+                    if (searchField.getText().equals("")) {
+                        contentTable = new ContentScroll(mangaArray);
+                        transition.display(contentTable.getScrollPane());
+                    } else {
+                        ArrayList<Manga> newMangaArray = new ArrayList<>();
+
+                        for (Manga manga : mangaArray) {
+                            if (manga.getGenre().toLowerCase().contains(searchField.getText().toLowerCase())) {
+                                newMangaArray.add(manga);
+                            }
+                        }
+
+                        contentTable = new ContentScroll(newMangaArray);
+                        transition.display(contentTable.getScrollPane());
+                    }
+                } else {
+                    if (searchField.getText().equals("")) {
+                        contentTable = new ContentScroll(mangaArray);
+                        transition.display(contentTable.getScrollPane());
+                    } else {
+                        ArrayList<Manga> newMangaArray = new ArrayList<>();
+
+                        for (Manga manga : mangaArray) {
+                            if (manga.getStatus().toLowerCase().contains(searchField.getText().toLowerCase())) {
+                                newMangaArray.add(manga);
+                            }
+                        }
+
+                        contentTable = new ContentScroll(newMangaArray);
+                        transition.display(contentTable.getScrollPane());
+                    }
                 }
             }
         });
