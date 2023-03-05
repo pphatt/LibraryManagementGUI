@@ -36,6 +36,7 @@ public class MainLayoutGUI {
     private JComboBox<String> filterStatusCombobox;
     private JPanel filterYearPanel;
     private JComboBox<String> filterYearCombobox;
+    private JButton clearButton;
     public static ContentScroll contentTable = new ContentScroll(mangaArray);
 
     /*
@@ -100,12 +101,7 @@ public class MainLayoutGUI {
         filterYearCombobox.setModel(yearComboboxModel);
 
         homeButton.addActionListener(e -> {
-            if (!state) {
-                return;
-            }
-
-            contentTable = new ContentScroll(mangaArray);
-            transition.display(contentTable.getScrollPane());
+            SearchAndFilterFunc(transition);
         });
 
         addButton.addActionListener(e -> {
@@ -118,8 +114,7 @@ public class MainLayoutGUI {
             dialog.setLocationRelativeTo(MainPanel);
             dialog.setVisible(true);
 
-            contentTable = new ContentScroll(mangaArray);
-            transition.display(contentTable.getScrollPane());
+            SearchAndFilterFunc(transition);
         });
 
         searchField.getDocument().addDocumentListener(new DocumentListener() {
@@ -154,22 +149,30 @@ public class MainLayoutGUI {
                 return;
             }
 
+            String uuid = contentTable.getTable().getModel().getValueAt(index, 0).toString();
             String title = contentTable.getTable().getValueAt(index, 0).toString();
             String author = contentTable.getTable().getValueAt(index, 1).toString();
             String genre = contentTable.getTable().getValueAt(index, 2).toString();
             String status = contentTable.getTable().getValueAt(index, 3).toString();
             String yearRelease = contentTable.getTable().getValueAt(index, 4).toString();
-            String description = mangaArray.get(index).getDescription();
             String chapter = contentTable.getTable().getValueAt(index, 5).toString();
 
-            EditBookGUI editBookGUI = new EditBookGUI(index, title, author, genre, status, yearRelease, description, chapter);
+            int indx = 0;
+
+            for (int i = 0; i < mangaArray.size(); i++) {
+                if (mangaArray.get(i).getUuid().equals(uuid)) {
+                    indx = i;
+                    break;
+                }
+            }
+
+            EditBookGUI editBookGUI = new EditBookGUI(indx, title, author, genre, status, yearRelease, mangaArray.get(indx).getDescription(), chapter);
             editBookGUI.setLocationRelativeTo(MainPanel);
             editBookGUI.setVisible(true);
 
             reWriteEntireData(mangaArray);
 
-            contentTable = new ContentScroll(mangaArray);
-            transition.display(contentTable.getScrollPane());
+            SearchAndFilterFunc(transition);
         });
 
         deleteButton.addActionListener(e -> {
@@ -183,22 +186,30 @@ public class MainLayoutGUI {
                 return;
             }
 
+            String uuid = contentTable.getTable().getModel().getValueAt(index, 0).toString();
             String title = contentTable.getTable().getValueAt(index, 0).toString();
             String author = contentTable.getTable().getValueAt(index, 1).toString();
             String genre = contentTable.getTable().getValueAt(index, 2).toString();
             String status = contentTable.getTable().getValueAt(index, 3).toString();
             String yearRelease = contentTable.getTable().getValueAt(index, 4).toString();
-            String description = mangaArray.get(index).getDescription();
             String chapter = contentTable.getTable().getValueAt(index, 5).toString();
 
-            DeleteBookDialog deleteBookDialog = new DeleteBookDialog(index, title, author, genre, status, yearRelease, description, chapter);
+            int indx = 0;
+
+            for (int i = 0; i < mangaArray.size(); i++) {
+                if (mangaArray.get(i).getUuid().equals(uuid)) {
+                    indx = i;
+                    break;
+                }
+            }
+
+            DeleteBookDialog deleteBookDialog = new DeleteBookDialog(indx, title, author, genre, status, yearRelease, mangaArray.get(indx).getDescription(), chapter);
             deleteBookDialog.setLocationRelativeTo(MainPanel);
             deleteBookDialog.setVisible(true);
 
             reWriteEntireData(mangaArray);
 
-            contentTable = new ContentScroll(mangaArray);
-            transition.display(contentTable.getScrollPane());
+            SearchAndFilterFunc(transition);
         });
 
         quitButton.addActionListener(e -> System.exit(0));
@@ -212,6 +223,18 @@ public class MainLayoutGUI {
         });
 
         filterYearCombobox.addActionListener(e -> {
+            SearchAndFilterFunc(transition);
+        });
+
+        clearButton.addActionListener(e -> {
+            if (!state) {
+                return;
+            }
+
+            filterGenreCombobox.setSelectedIndex(0);
+            filterStatusCombobox.setSelectedIndex(0);
+            filterYearCombobox.setSelectedIndex(0);
+
             SearchAndFilterFunc(transition);
         });
     }

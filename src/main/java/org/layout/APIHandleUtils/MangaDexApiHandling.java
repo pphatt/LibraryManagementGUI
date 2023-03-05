@@ -112,7 +112,7 @@ public class MangaDexApiHandling {
                     .thenAccept(MangaDexApiHandling::getMangaChapter)
                     .join();
 
-            a.addRow(new Object[]{title, author, genre, status, yearRelease, chapterArray.get(i)});
+            a.addRow(new Object[]{uuid, title, author, genre, status, yearRelease, chapterArray.get(i)});
             MainLayoutGUI.contentTable.getTable().setModel(a);
 
             mangaArray.add(new Manga(uuid, title, author, genre, status, yearRelease, description, coverPath, chapterArray.get(i)));

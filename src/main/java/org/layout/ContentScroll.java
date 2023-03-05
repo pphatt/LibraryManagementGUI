@@ -22,6 +22,7 @@ public class ContentScroll extends JPanel {
 
         contentTable.setModel(model);
 
+        model.addColumn("ID");
         model.addColumn("Title");
         model.addColumn("Author");
         model.addColumn("Genre");
@@ -30,9 +31,10 @@ public class ContentScroll extends JPanel {
         model.addColumn("Chapter");
 
         contentTable.getTableHeader().setReorderingAllowed(false);
+        contentTable.removeColumn(contentTable.getColumnModel().getColumn(0));
 
         for (Manga manga : mangaArray) {
-            model.addRow(new Object[]{manga.getTitle(), manga.getAuthor(), manga.getGenre(), manga.getStatus(),
+            model.addRow(new Object[]{manga.getUuid(), manga.getTitle(), manga.getAuthor(), manga.getGenre(), manga.getStatus(),
                     manga.getYearRelease(), manga.getChapters()});
         }
 
