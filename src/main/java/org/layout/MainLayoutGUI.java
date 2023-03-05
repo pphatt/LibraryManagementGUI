@@ -10,6 +10,7 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static org.layout.APIHandleUtils.MangaDexApiHandling.*;
 
@@ -28,6 +29,13 @@ public class MainLayoutGUI {
     private JButton editButton;
     private JButton deleteButton;
     private JComboBox<String> optionSearchCombobox;
+    private JPanel filterPanel;
+    private JPanel filterGenrePanel;
+    private JComboBox<String> filterGenreCombobox;
+    private JPanel filterStatusPanel;
+    private JComboBox<String> filterStatusCombobox;
+    private JPanel filterYearPanel;
+    private JComboBox<String> filterYearCombobox;
     public static ContentScroll contentTable = new ContentScroll(mangaArray);
 
     /*
@@ -72,6 +80,25 @@ public class MainLayoutGUI {
         DefaultComboBoxModel<String> optionModel = new DefaultComboBoxModel<>(options);
         optionSearchCombobox.setModel(optionModel);
 
+        String[] genreOption = {"No filter", "manga", "science", "adventure", "slice of life"};
+        String[] statusOption = {"No filter", "ongoing", "completed", "hiatus", "cancelled"};
+        String[] yearOption = new String[24];
+
+        yearOption[0] = "No filter";
+
+        for (int i = 1; i < yearOption.length; i++) {
+            yearOption[i] = 2000 + yearOption.length - i + "";
+        }
+
+        DefaultComboBoxModel<String> genreComboboxModel = new DefaultComboBoxModel<>(genreOption);
+        filterGenreCombobox.setModel(genreComboboxModel);
+
+        DefaultComboBoxModel<String> statusComboboxModel = new DefaultComboBoxModel<>(statusOption);
+        filterStatusCombobox.setModel(statusComboboxModel);
+
+        DefaultComboBoxModel<String> yearComboboxModel = new DefaultComboBoxModel<>(yearOption);
+        filterYearCombobox.setModel(yearComboboxModel);
+
         homeButton.addActionListener(e -> {
             if (!state) {
                 return;
@@ -112,78 +139,7 @@ public class MainLayoutGUI {
             }
 
             public void renderTableOnSearch() {
-                if (!state) {
-                    return;
-                }
-
-                String option = (String) optionSearchCombobox.getSelectedItem();
-
-                assert option != null;
-                if (option.equals("Title")) {
-                    if (searchField.getText().equals("")) {
-                        contentTable = new ContentScroll(mangaArray);
-                        transition.display(contentTable.getScrollPane());
-                    } else {
-                        ArrayList<Manga> newMangaArray = new ArrayList<>();
-
-                        for (Manga manga : mangaArray) {
-                            if (manga.getTitle().toLowerCase().contains(searchField.getText().toLowerCase())) {
-                                newMangaArray.add(manga);
-                            }
-                        }
-
-                        contentTable = new ContentScroll(newMangaArray);
-                        transition.display(contentTable.getScrollPane());
-                    }
-                } else if (option.equals("Author")) {
-                    if (searchField.getText().equals("")) {
-                        contentTable = new ContentScroll(mangaArray);
-                        transition.display(contentTable.getScrollPane());
-                    } else {
-                        ArrayList<Manga> newMangaArray = new ArrayList<>();
-
-                        for (Manga manga : mangaArray) {
-                            if (manga.getAuthor().toLowerCase().contains(searchField.getText().toLowerCase())) {
-                                newMangaArray.add(manga);
-                            }
-                        }
-
-                        contentTable = new ContentScroll(newMangaArray);
-                        transition.display(contentTable.getScrollPane());
-                    }
-                } else if (option.equals("Genre")) {
-                    if (searchField.getText().equals("")) {
-                        contentTable = new ContentScroll(mangaArray);
-                        transition.display(contentTable.getScrollPane());
-                    } else {
-                        ArrayList<Manga> newMangaArray = new ArrayList<>();
-
-                        for (Manga manga : mangaArray) {
-                            if (manga.getGenre().toLowerCase().contains(searchField.getText().toLowerCase())) {
-                                newMangaArray.add(manga);
-                            }
-                        }
-
-                        contentTable = new ContentScroll(newMangaArray);
-                        transition.display(contentTable.getScrollPane());
-                    }
-                } else {
-                    if (searchField.getText().equals("")) {
-                        contentTable = new ContentScroll(mangaArray);
-                        transition.display(contentTable.getScrollPane());
-                    } else {
-                        ArrayList<Manga> newMangaArray = new ArrayList<>();
-
-                        for (Manga manga : mangaArray) {
-                            if (manga.getStatus().toLowerCase().contains(searchField.getText().toLowerCase())) {
-                                newMangaArray.add(manga);
-                            }
-                        }
-
-                        contentTable = new ContentScroll(newMangaArray);
-                        transition.display(contentTable.getScrollPane());
-                    }
-                }
+                SearchAndFilterFunc(transition);
             }
         });
 
@@ -246,6 +202,18 @@ public class MainLayoutGUI {
         });
 
         quitButton.addActionListener(e -> System.exit(0));
+
+        filterGenreCombobox.addActionListener(e -> {
+            SearchAndFilterFunc(transition);
+        });
+
+        filterStatusCombobox.addActionListener(e -> {
+            SearchAndFilterFunc(transition);
+        });
+
+        filterYearCombobox.addActionListener(e -> {
+            SearchAndFilterFunc(transition);
+        });
     }
 
     public static void reWriteEntireData(ArrayList<Manga> array) {
@@ -286,6 +254,134 @@ public class MainLayoutGUI {
         }
 
         return null;
+    }
+
+    private void HandleFilter(ArrayList<Manga> newMangaArray, Manga manga) {
+        if (!Objects.equals(filterGenreCombobox.getSelectedItem(), "No filter")) {
+            if (!Objects.equals(filterGenreCombobox.getSelectedItem(), manga.getGenre())) {
+                return;
+            }
+        }
+
+        if (!Objects.equals(filterStatusCombobox.getSelectedItem(), "No filter")) {
+            if (!Objects.equals(filterStatusCombobox.getSelectedItem(), manga.getStatus())) {
+                return;
+            }
+        }
+
+        if (!Objects.equals(filterYearCombobox.getSelectedItem(), "No filter")) {
+            if (!Objects.equals(filterYearCombobox.getSelectedItem(), manga.getYearRelease())) {
+                return;
+            }
+        }
+
+        newMangaArray.add(manga);
+    }
+
+    public void SearchAndFilterFunc(Transition transition) {
+        ArrayList<Manga> newMangaArray;
+
+        if (!state) {
+            return;
+        }
+
+        String option = (String) optionSearchCombobox.getSelectedItem();
+
+        assert option != null;
+        switch (option) {
+            case "Title" -> {
+                if (searchField.getText().equals("")) {
+                    newMangaArray = new ArrayList<>();
+
+                    for (Manga manga : mangaArray) {
+                        HandleFilter(newMangaArray, manga);
+                    }
+
+                    contentTable = new ContentScroll(newMangaArray);
+                    transition.display(contentTable.getScrollPane());
+                } else {
+                    newMangaArray = new ArrayList<>();
+
+                    for (Manga manga : mangaArray) {
+                        if (manga.getTitle().toLowerCase().contains(searchField.getText().toLowerCase())) {
+                            HandleFilter(newMangaArray, manga);
+                        }
+                    }
+
+                    contentTable = new ContentScroll(newMangaArray);
+                    transition.display(contentTable.getScrollPane());
+                }
+            }
+            case "Author" -> {
+                if (searchField.getText().equals("")) {
+                    newMangaArray = new ArrayList<>();
+
+                    for (Manga manga : mangaArray) {
+                        HandleFilter(newMangaArray, manga);
+                    }
+
+                    contentTable = new ContentScroll(newMangaArray);
+                    transition.display(contentTable.getScrollPane());
+                } else {
+                    newMangaArray = new ArrayList<>();
+
+                    for (Manga manga : mangaArray) {
+                        if (manga.getAuthor().toLowerCase().contains(searchField.getText().toLowerCase())) {
+                            HandleFilter(newMangaArray, manga);
+                        }
+                    }
+
+                    contentTable = new ContentScroll(newMangaArray);
+                    transition.display(contentTable.getScrollPane());
+                }
+            }
+            case "Genre" -> {
+                if (searchField.getText().equals("")) {
+                    newMangaArray = new ArrayList<>();
+
+                    for (Manga manga : mangaArray) {
+                        HandleFilter(newMangaArray, manga);
+                    }
+
+                    contentTable = new ContentScroll(newMangaArray);
+                    transition.display(contentTable.getScrollPane());
+                } else {
+                    newMangaArray = new ArrayList<>();
+
+                    for (Manga manga : mangaArray) {
+                        if (manga.getGenre().toLowerCase().contains(searchField.getText().toLowerCase())) {
+                            HandleFilter(newMangaArray, manga);
+                        }
+                    }
+
+                    contentTable = new ContentScroll(newMangaArray);
+                    transition.display(contentTable.getScrollPane());
+                }
+            }
+            default -> {
+                if (searchField.getText().equals("")) {
+                    newMangaArray = new ArrayList<>();
+
+                    for (Manga manga : mangaArray) {
+                        HandleFilter(newMangaArray, manga);
+                    }
+
+                    contentTable = new ContentScroll(newMangaArray);
+                    transition.display(contentTable.getScrollPane());
+                } else {
+                    newMangaArray = new ArrayList<>();
+
+                    for (Manga manga : mangaArray) {
+                        if (manga.getStatus().toLowerCase().contains(searchField.getText().toLowerCase())) {
+                            HandleFilter(newMangaArray, manga);
+                        }
+                    }
+
+                    contentTable = new ContentScroll(newMangaArray);
+                    transition.display(contentTable.getScrollPane());
+                }
+            }
+        }
     }
 
     public static void main(String[] args) {
