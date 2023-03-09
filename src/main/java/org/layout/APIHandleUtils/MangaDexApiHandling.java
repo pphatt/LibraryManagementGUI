@@ -10,8 +10,11 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import org.layout.db.SQLConnectionString;
 
 public class MangaDexApiHandling {
     public static ArrayList<Manga> mangaArray = new ArrayList<>();
@@ -33,7 +36,6 @@ public class MangaDexApiHandling {
 
     public static void getManga(String responseBody) {
         DefaultTableModel a = (DefaultTableModel) MainLayoutGUI.contentTable.getTable().getModel();
-        ArrayList<Manga> ab = MainLayoutGUI.readData();
         JSONObject jsonObject = new JSONObject(responseBody);
         JSONArray mangas = new JSONArray(jsonObject.getJSONArray("data"));
 
@@ -58,6 +60,14 @@ public class MangaDexApiHandling {
                 author = relationships.getJSONObject(0)
                         .getJSONObject("attributes")
                         .getString("name").trim();
+            } catch (JSONException ignored) {
+            }
+
+            String authorID = "";
+
+            try {
+                authorID = relationships.getJSONObject(0)
+                        .getString("id").trim();
             } catch (JSONException ignored) {
             }
 
@@ -112,32 +122,86 @@ public class MangaDexApiHandling {
                     .thenAccept(MangaDexApiHandling::getMangaChapter)
                     .join();
 
+            try (Connection connection = DriverManager.getConnection(SQLConnectionString.getConnectionString())) {
+                PreparedStatement checkBookIDDup = connection.prepareStatement("Select * from Book where " + "Book.ID = ?");
+                checkBookIDDup.setString(1, uuid);
+                ResultSet checkBookIDDupRes = checkBookIDDup.executeQuery();
+
+                if (checkBookIDDupRes.next()) {
+                    a.addRow(new Object[]{uuid, title, author, genre, status, yearRelease, chapterArray.get(i)});
+                    MainLayoutGUI.contentTable.getTable().setModel(a);
+
+                    mangaArray.add(new Manga(uuid, title, author, genre, status, yearRelease, description, coverPath, chapterArray.get(i)));
+                    continue;
+                }
+
+                PreparedStatement authorQuery = connection.prepareStatement("Select * from Author where " + "Author.ID = ?");
+                authorQuery.setString(1, authorID);
+                ResultSet authorRes = authorQuery.executeQuery();
+
+                if (!authorRes.next()) {
+                    PreparedStatement insertAuthorQuery = connection.prepareStatement("Insert into Author (ID, Name, State) values (?, ?, '0')");
+                    insertAuthorQuery.setString(1, authorID);
+                    insertAuthorQuery.setString(2, author);
+                    insertAuthorQuery.execute();
+                }
+
+                PreparedStatement insertBookQuery = connection.prepareStatement(
+                        "Insert into Book (ID, Title, Author, Genre, Status, YearReleased, Description, Cover, Chapter, State) values " +
+                                "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                );
+
+                insertBookQuery.setString(1, uuid);
+                insertBookQuery.setString(2, title);
+                insertBookQuery.setString(3, authorID);
+                insertBookQuery.setString(4, "1");
+                insertBookQuery.setString(5, status);
+                insertBookQuery.setString(6, yearRelease);
+                insertBookQuery.setString(7, description);
+                insertBookQuery.setString(8, coverPath);
+                insertBookQuery.setString(9, chapterArray.get(i).toString());
+                insertBookQuery.setString(10, "0");
+                insertBookQuery.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
             a.addRow(new Object[]{uuid, title, author, genre, status, yearRelease, chapterArray.get(i)});
             MainLayoutGUI.contentTable.getTable().setModel(a);
 
             mangaArray.add(new Manga(uuid, title, author, genre, status, yearRelease, description, coverPath, chapterArray.get(i)));
         }
 
-        if (ab != null) {
-            for (Manga value : ab) {
-                boolean c = true;
+        try (Connection connection = DriverManager.getConnection(SQLConnectionString.getConnectionString())) {
+            PreparedStatement retrieveBook = connection.prepareStatement(
+                    "Select Book.ID, Book.Title, Author.Name, Book.Genre, Book.Status, Book.YearReleased, Book.Description, Book.Cover, Book.Chapter from Book, Author where Book.Author = Author.ID");
+            ResultSet retrieveBookRes = retrieveBook.executeQuery();
 
-                for (Manga manga : mangaArray) {
-                    if (manga.getUuid().equals(value.getUuid())) {
-                        c = false;
+            while (retrieveBookRes.next()) {
+                boolean c = false;
+                for (int i = 0; i < mangaArray.size(); i++) {
+                    if (mangaArray.get(i).getUuid().equals(retrieveBookRes.getString(1))) {
+                        c = true;
                         break;
                     }
                 }
 
-                if (c) {
-                    mangaArray.add(value);
-                    a.addRow(new Object[]{value.getUuid(), value.getTitle(), value.getAuthor(), value.getGenre(), value.getStatus(), value.getYearRelease(), value.getChapters()});
-                    MainLayoutGUI.contentTable.getTable().setModel(a);
+                if (!c) {
+                    mangaArray.add(new Manga(retrieveBookRes.getString(1),
+                            retrieveBookRes.getString(2),
+                            retrieveBookRes.getString(3),
+                            retrieveBookRes.getString(4),
+                            retrieveBookRes.getString(5),
+                            retrieveBookRes.getString(6),
+                            retrieveBookRes.getString(7),
+                            retrieveBookRes.getString(8),
+                            Integer.parseInt(retrieveBookRes.getString(9))));
                 }
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
-        MainLayoutGUI.reWriteEntireData(mangaArray);
         state = true;
     }
 

@@ -1,11 +1,13 @@
 package org.layout;
 
 import org.layout.APIHandleUtils.Manga;
+import org.layout.db.SQLConnectionString;
 
 import javax.swing.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.*;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -125,16 +127,38 @@ public class AddBookGUI {
                     Objects.requireNonNull(yearCombobox.getSelectedItem()).toString(),
                     descriptionTextArea.getText(), "Not available", chapter));
 
-            try(BufferedWriter data = new BufferedWriter(new FileWriter("book-data.txt", true))) {
-                data.write(UUID.randomUUID() + ";");
-                data.write(titleInput.getText() + ";");
-                data.write(authorInput.getText() + ";");
-                data.write(genreCombobox.getSelectedItem().toString() + ";");
-                data.write(statusCombobox.getSelectedItem().toString() + ";");
-                data.write(yearCombobox.getSelectedItem().toString() + ";");
-                data.write(descriptionTextArea.getText().trim().replaceAll("\n", " ") + ";");
-                data.write(chapterInput.getText() + System.lineSeparator());
-            } catch (IOException ignored) {
+            try (Connection connection = DriverManager.getConnection(SQLConnectionString.getConnectionString())) {
+                PreparedStatement authorQuery = connection.prepareStatement("Select * from Author where " + "Author.Name = ?");
+                authorQuery.setString(1, authorInput.getText());
+                ResultSet authorRes = authorQuery.executeQuery();
+                String authorUUID = UUID.randomUUID().toString();
+
+                if (authorRes.next()) {
+                    authorUUID = authorRes.getString(1);
+                } else {
+                    PreparedStatement insertAuthorQuery = connection.prepareStatement("Insert into Author (ID, Name, State) values (?, ?, '0')");
+                    insertAuthorQuery.setString(1, authorUUID);
+                    insertAuthorQuery.setString(2, authorInput.getText());
+                    insertAuthorQuery.execute();
+                }
+
+                PreparedStatement insertBookQuery = connection.prepareStatement(
+                        "Insert into Book (ID, Title, Author, Genre, Status, YearReleased, Description, Cover, Chapter, State) values " +
+                                "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                );
+
+                insertBookQuery.setString(1, UUID.randomUUID().toString());
+                insertBookQuery.setString(2, titleInput.getText());
+                insertBookQuery.setString(3, authorUUID);
+                insertBookQuery.setString(4, "1");
+                insertBookQuery.setString(5, statusCombobox.getSelectedItem().toString());
+                insertBookQuery.setString(6, yearCombobox.getSelectedItem().toString());
+                insertBookQuery.setString(7, descriptionTextArea.getText());
+                insertBookQuery.setString(8, "Not available");
+                insertBookQuery.setString(9, chapter + "");
+                insertBookQuery.setString(10, "0");
+                insertBookQuery.execute();
+            } catch (SQLException ignored) {
             }
 
             titleInput.setText("");
