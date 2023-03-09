@@ -32,6 +32,7 @@ public class ContentScroll extends JPanel {
 
         contentTable.getTableHeader().setReorderingAllowed(false);
         contentTable.removeColumn(contentTable.getColumnModel().getColumn(0));
+        contentTable.setRowHeight(30);
 
         for (Manga manga : mangaArray) {
             model.addRow(new Object[]{manga.getUuid(), manga.getTitle(), manga.getAuthor(), manga.getGenre(), manga.getStatus(),

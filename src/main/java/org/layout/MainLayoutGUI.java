@@ -63,7 +63,7 @@ public class MainLayoutGUI {
 
     public MainLayoutGUI() {
         Transition transition = new Transition();
-        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(100);
+        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(10);
 
         GridBagConstraints constraints = new GridBagConstraints();
 
@@ -105,11 +105,27 @@ public class MainLayoutGUI {
         });
 
         addButton.addActionListener(e -> {
+            if (!state) {
+                JOptionPane.showMessageDialog(mainLayout,
+                        "System is fetching data. Please wait until it is fulfill", "Notify message",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                return;
+            }
+
             AddBookGUI addBook = new AddBookGUI();
             transition.display(addBook.getAddBookGUI());
         });
 
         addDialogButton.addActionListener(e -> {
+            if (!state) {
+                JOptionPane.showMessageDialog(mainLayout,
+                        "System is fetching data. Please wait until it is fulfill", "Notify message",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                return;
+            }
+
             AddBookDialog dialog = new AddBookDialog();
             dialog.setLocationRelativeTo(MainPanel);
             dialog.setVisible(true);
@@ -139,6 +155,14 @@ public class MainLayoutGUI {
         });
 
         editButton.addActionListener(e -> {
+            if (!state) {
+                JOptionPane.showMessageDialog(mainLayout,
+                        "System is fetching data. Please wait until it is fulfill", "Notify message",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                return;
+            }
+
             int index = contentTable.getTable().getSelectedRow();
 
             if (index == -1) {
@@ -176,6 +200,14 @@ public class MainLayoutGUI {
         });
 
         deleteButton.addActionListener(e -> {
+            if (!state) {
+                JOptionPane.showMessageDialog(mainLayout,
+                        "System is fetching data. Please wait until it is fulfill", "Notify message",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                return;
+            }
+
             int index = contentTable.getTable().getSelectedRow();
 
             if (index == -1) {
@@ -302,11 +334,15 @@ public class MainLayoutGUI {
     }
 
     public void SearchAndFilterFunc(Transition transition) {
-        ArrayList<Manga> newMangaArray;
-
         if (!state) {
+            JOptionPane.showMessageDialog(mainLayout,
+                    "System is fetching data. Please wait until it is fulfill", "Notify message",
+                    JOptionPane.INFORMATION_MESSAGE);
+
             return;
         }
+
+        ArrayList<Manga> newMangaArray;
 
         String option = (String) optionSearchCombobox.getSelectedItem();
 

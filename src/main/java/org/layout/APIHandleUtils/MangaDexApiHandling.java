@@ -131,7 +131,7 @@ public class MangaDexApiHandling {
 
                 if (c) {
                     mangaArray.add(value);
-                    a.addRow(new Object[]{value.getTitle(), value.getAuthor(), value.getGenre(), value.getStatus(), value.getYearRelease(), value.getChapters()});
+                    a.addRow(new Object[]{value.getUuid(), value.getTitle(), value.getAuthor(), value.getGenre(), value.getStatus(), value.getYearRelease(), value.getChapters()});
                     MainLayoutGUI.contentTable.getTable().setModel(a);
                 }
             }
