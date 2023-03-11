@@ -1,8 +1,11 @@
 package org.layout;
 
+import org.layout.db.SQLConnectionString;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.*;
 
 import static org.layout.APIHandleUtils.MangaDexApiHandling.mangaArray;
 
@@ -54,11 +57,7 @@ public class DeleteBookDialog extends JDialog {
         });
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         deleteButton.addActionListener(e -> {
             String[] options = {"Yes", "No"};
@@ -68,6 +67,15 @@ public class DeleteBookDialog extends JDialog {
                     JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
 
             if (o == JOptionPane.YES_OPTION) {
+                try (Connection connection = DriverManager.getConnection(SQLConnectionString.getConnectionString())) {
+                    PreparedStatement authorQuery = connection.prepareStatement("update book set book.State = 1 where ID = ?");
+                    authorQuery.setString(1, mangaArray.get(index).getUuid());
+                    authorQuery.executeUpdate();
+                }
+                catch (SQLException error) {
+                    error.printStackTrace();
+                }
+
                 mangaArray.remove(index);
             }
 

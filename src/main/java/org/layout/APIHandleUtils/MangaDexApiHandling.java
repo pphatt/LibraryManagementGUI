@@ -143,7 +143,7 @@ public class MangaDexApiHandling {
                     PreparedStatement insertAuthorQuery = connection.prepareStatement("Insert into Author (ID, Name, State) values (?, ?, '0')");
                     insertAuthorQuery.setString(1, authorID);
                     insertAuthorQuery.setString(2, author);
-                    insertAuthorQuery.execute();
+                    insertAuthorQuery.executeUpdate();
                 }
 
                 PreparedStatement insertBookQuery = connection.prepareStatement(
@@ -161,7 +161,7 @@ public class MangaDexApiHandling {
                 insertBookQuery.setString(8, coverPath);
                 insertBookQuery.setString(9, chapterArray.get(i).toString());
                 insertBookQuery.setString(10, "0");
-                insertBookQuery.execute();
+                insertBookQuery.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

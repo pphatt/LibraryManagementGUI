@@ -157,7 +157,7 @@ public class AddBookGUI {
                 insertBookQuery.setString(8, "Not available");
                 insertBookQuery.setString(9, chapter + "");
                 insertBookQuery.setString(10, "0");
-                insertBookQuery.execute();
+                insertBookQuery.executeUpdate();
             } catch (SQLException ignored) {
             }
 

@@ -3,6 +3,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 book-data.txt
+db/SQLConnectionString.java
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
