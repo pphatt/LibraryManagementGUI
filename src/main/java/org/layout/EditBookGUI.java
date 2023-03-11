@@ -15,7 +15,7 @@ public class EditBookGUI extends JDialog {
     private JTextField editTitleField;
     private JPanel editAuthorLayout;
     private JTextField editAuthorField;
-    private JPanel editGenreLayout;
+    private JPanel editTypeLayout;
     private JComboBox<String> editGenreCombobox;
     private JPanel editStatusLayout;
     private JComboBox<String> editStatusCombobox;
@@ -30,7 +30,7 @@ public class EditBookGUI extends JDialog {
     private JButton cancelButton;
     private JLabel warningTitleField;
     private JLabel warningAuthorField;
-    private JLabel warningGenreField;
+    private JLabel warningTypeField;
     private JLabel warningStatusField;
     private JLabel warningYearField;
     private JLabel warningDescriptionField;

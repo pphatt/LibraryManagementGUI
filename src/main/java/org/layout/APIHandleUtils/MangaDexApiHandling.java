@@ -13,6 +13,7 @@ import java.net.http.HttpResponse;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.layout.db.SQLConnectionString;
 
@@ -71,10 +72,10 @@ public class MangaDexApiHandling {
             } catch (JSONException ignored) {
             }
 
-            String genre = "Not available";
+            String type = "Not available";
 
             try {
-                genre = mangaObject.getString("type");
+                type = mangaObject.getString("type");
             } catch (JSONException ignored) {
             }
 
@@ -128,10 +129,14 @@ public class MangaDexApiHandling {
                 ResultSet checkBookIDDupRes = checkBookIDDup.executeQuery();
 
                 if (checkBookIDDupRes.next()) {
-                    a.addRow(new Object[]{uuid, title, author, genre, status, yearRelease, chapterArray.get(i)});
+                    if (Objects.equals(checkBookIDDupRes.getString(10), "1")) {
+                        continue;
+                    }
+
+                    a.addRow(new Object[]{uuid, title, author, type, status, yearRelease, chapterArray.get(i)});
                     MainLayoutGUI.contentTable.getTable().setModel(a);
 
-                    mangaArray.add(new Manga(uuid, title, author, genre, status, yearRelease, description, coverPath, chapterArray.get(i)));
+                    mangaArray.add(new Manga(uuid, title, author, type, status, yearRelease, description, coverPath, chapterArray.get(i)));
                     continue;
                 }
 
@@ -146,8 +151,18 @@ public class MangaDexApiHandling {
                     insertAuthorQuery.executeUpdate();
                 }
 
+                PreparedStatement typeQuery = SQLConnectionString.getConnection().prepareStatement("Select * from Type where " + "Type.Name = ?");
+                typeQuery.setString(1, type);
+                ResultSet typeRes = typeQuery.executeQuery();
+
+                if (!typeRes.next()) {
+                    PreparedStatement insertTypeQuery = SQLConnectionString.getConnection().prepareStatement("Insert into Type (Name) values (?)");
+                    insertTypeQuery.setString(1, type);
+                    insertTypeQuery.executeUpdate();
+                }
+
                 PreparedStatement insertBookQuery = SQLConnectionString.getConnection().prepareStatement(
-                        "Insert into Book (ID, Title, Author, Genre, Status, YearReleased, Description, Cover, Chapter, State) values " +
+                        "Insert into Book (ID, Title, Author, Type, Status, YearReleased, Description, Cover, Chapter, State) values " +
                                 "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                 );
 
@@ -165,19 +180,24 @@ public class MangaDexApiHandling {
             } catch (Exception e) {
             }
 
-            a.addRow(new Object[]{uuid, title, author, genre, status, yearRelease, chapterArray.get(i)});
+            a.addRow(new Object[]{uuid, title, author, type, status, yearRelease, chapterArray.get(i)});
             MainLayoutGUI.contentTable.getTable().setModel(a);
 
-            mangaArray.add(new Manga(uuid, title, author, genre, status, yearRelease, description, coverPath, chapterArray.get(i)));
+            mangaArray.add(new Manga(uuid, title, author, type, status, yearRelease, description, coverPath, chapterArray.get(i)));
         }
 
         try {
             PreparedStatement retrieveBook = SQLConnectionString.getConnection().prepareStatement(
-                    "Select Book.ID, Book.Title, Author.Name, Book.Genre, Book.Status, Book.YearReleased, Book.Description, Book.Cover, Book.Chapter from Book, Author where Book.Author = Author.ID");
+                    "Select Book.ID, Book.Title, Author.Name, Book.Type, Book.Status, Book.YearReleased, Book.Description, Book.Cover, Book.Chapter, Book.State from Book, Author where Book.Author = Author.ID");
             ResultSet retrieveBookRes = retrieveBook.executeQuery();
 
             while (retrieveBookRes.next()) {
+                if (Objects.equals(retrieveBookRes.getString(10), "1")) {
+                    continue;
+                }
+
                 boolean c = false;
+
                 for (int i = 0; i < mangaArray.size(); i++) {
                     if (mangaArray.get(i).getUuid().equals(retrieveBookRes.getString(1))) {
                         c = true;

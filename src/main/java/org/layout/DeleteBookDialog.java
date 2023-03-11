@@ -17,8 +17,8 @@ public class DeleteBookDialog extends JDialog {
     private JLabel bookTitleDetail;
     private JPanel authorLayout;
     private JLabel bookAuthorDetail;
-    private JPanel genreLayout;
-    private JLabel bookGenreDetail;
+    private JPanel typeLayout;
+    private JLabel bookTypeDetail;
     private JPanel statusLayout;
     private JLabel bookStatusDetail;
     private JPanel yearLayout;
@@ -39,7 +39,7 @@ public class DeleteBookDialog extends JDialog {
 
         bookTitleDetail.setText(title);
         bookAuthorDetail.setText(author);
-        bookGenreDetail.setText(genre);
+        bookTypeDetail.setText(genre);
         bookStatusDetail.setText(status);
         bookYearDetail.setText(year);
 

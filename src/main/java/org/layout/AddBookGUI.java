@@ -143,7 +143,7 @@ public class AddBookGUI {
                 }
 
                 PreparedStatement insertBookQuery = SQLConnectionString.getConnection().prepareStatement(
-                        "Insert into Book (ID, Title, Author, Genre, Status, YearReleased, Description, Cover, Chapter, State) values " +
+                        "Insert into Book (ID, Title, Author, Type, Status, YearReleased, Description, Cover, Chapter, State) values " +
                                 "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                 );
 

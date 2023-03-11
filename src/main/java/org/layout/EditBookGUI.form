@@ -79,19 +79,19 @@
                   </component>
                 </children>
               </grid>
-              <grid id="faf89" binding="editGenreLayout" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+              <grid id="faf89" binding="editTypeLayout" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="5" left="5" bottom="5" right="5"/>
                 <constraints>
                   <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties/>
-                <border type="line" title="Genre">
+                <border type="line" title="Type">
                   <font/>
                   <title-color color="-6840403"/>
                   <color color="-6840403"/>
                 </border>
                 <children>
-                  <component id="9a24" class="javax.swing.JLabel" binding="warningGenreField">
+                  <component id="9a24" class="javax.swing.JLabel" binding="warningTypeField">
                     <constraints>
                       <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                     </constraints>

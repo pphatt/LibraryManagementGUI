@@ -11,8 +11,8 @@ public class ViewDetailsBook extends JDialog {
     private JPanel titleLayout;
     private JLabel bookAuthorDetail;
     private JPanel authorLayout;
-    private JLabel bookGenreDetail;
-    private JPanel genreLayout;
+    private JLabel bookTypeDetail;
+    private JPanel typeLayout;
     private JLabel bookStatusDetail;
     private JPanel statusLayout;
     private JLabel bookYearDetail;
@@ -24,7 +24,7 @@ public class ViewDetailsBook extends JDialog {
     private JScrollPane scrollViewDetail;
     private JPanel bookDetailsLayout;
 
-    public ViewDetailsBook(String title, String author, String genre, String status, String year, String description, String chapter) {
+    public ViewDetailsBook(String title, String author, String type, String status, String year, String description, String chapter) {
         setContentPane(contentPane);
         setModal(true);
         setTitle("View Book Details: " + title);
@@ -32,7 +32,7 @@ public class ViewDetailsBook extends JDialog {
 
         bookTitleDetail.setText(title);
         bookAuthorDetail.setText(author);
-        bookGenreDetail.setText(genre);
+        bookTypeDetail.setText(type);
         bookStatusDetail.setText(status);
         bookYearDetail.setText(year);
 

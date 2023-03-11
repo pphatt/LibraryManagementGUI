@@ -25,7 +25,7 @@ public class ContentScroll extends JPanel {
         model.addColumn("ID");
         model.addColumn("Title");
         model.addColumn("Author");
-        model.addColumn("Genre");
+        model.addColumn("Type");
         model.addColumn("Status");
         model.addColumn("Year Release");
         model.addColumn("Chapter");
