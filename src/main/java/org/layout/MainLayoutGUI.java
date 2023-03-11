@@ -40,7 +40,7 @@ public class MainLayoutGUI {
 
     public MainLayoutGUI() {
         Transition transition = new Transition();
-        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(100);
+        MangaDexApiHandling mangaDexApiHandling = new MangaDexApiHandling(1);
 
         GridBagConstraints constraints = new GridBagConstraints();
 

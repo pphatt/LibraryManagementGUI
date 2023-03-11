@@ -19,6 +19,7 @@ import org.layout.db.SQLConnectionString;
 
 public class MangaDexApiHandling {
     public static ArrayList<Manga> mangaArray = new ArrayList<>();
+    public static ArrayList<ArrayList<String>> tags = new ArrayList<>();
     public static ArrayList<Integer> chapterArray = new ArrayList<>();
     public static boolean state = false;
 
@@ -77,6 +78,23 @@ public class MangaDexApiHandling {
             try {
                 type = mangaObject.getString("type");
             } catch (JSONException ignored) {
+            }
+
+            JSONArray ab = attributes.getJSONArray("tags");
+            ArrayList<ArrayList<String>> tag = new ArrayList<>();
+
+            for (int j = 0; j < ab.length(); j++) {
+                ArrayList<String> t = new ArrayList<>();
+
+                JSONObject b = ab.getJSONObject(j);
+                String tagID = b.getString("id");
+                JSONObject tagAttr = b.getJSONObject("attributes");
+                JSONObject tagNameObj = tagAttr.getJSONObject("name");
+                String tagName = tagNameObj.getString("en");
+
+                t.add(tagID);
+                t.add(tagName);
+                tag.add(t);
             }
 
             String status = "Not available";
@@ -159,6 +177,31 @@ public class MangaDexApiHandling {
                     PreparedStatement insertTypeQuery = SQLConnectionString.getConnection().prepareStatement("Insert into Type (Name) values (?)");
                     insertTypeQuery.setString(1, type);
                     insertTypeQuery.executeUpdate();
+                }
+
+                for (ArrayList<String> strings : tag) {
+                    PreparedStatement checkGenre = SQLConnectionString.getConnection().prepareStatement("Select * from Genre where ID = ?");
+                    checkGenre.setString(1, strings.get(0));
+                    ResultSet checkGenreRes = checkGenre.executeQuery();
+
+                    if (!checkGenreRes.next()) {
+                        PreparedStatement insertGenre = SQLConnectionString.getConnection().prepareStatement(
+                                "Insert into Genre (ID, Name, State) values " +
+                                        "(?, ?, ?)"
+                        );
+
+                        insertGenre.setString(1, strings.get(0));
+                        insertGenre.setString(2, strings.get(1));
+                        insertGenre.setString(3, "0");
+                        insertGenre.executeUpdate();
+                    }
+
+                    /*
+                    * TODO:
+                    *  - update genre for book
+                    *
+                    * */
+                    tags.add(strings);
                 }
 
                 PreparedStatement insertBookQuery = SQLConnectionString.getConnection().prepareStatement(
