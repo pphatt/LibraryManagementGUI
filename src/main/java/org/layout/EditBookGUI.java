@@ -170,14 +170,6 @@ public class EditBookGUI extends JDialog {
     }
 
     private void onCancel() {
-        // add your code here if necessary
         dispose();
     }
-
-//    public static void main(String[] args) {
-//        EditBookGUI dialog = new EditBookGUI();
-//        dialog.pack();
-//        dialog.setVisible(true);
-//        System.exit(0);
-//    }
 }

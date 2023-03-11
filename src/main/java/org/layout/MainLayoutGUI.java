@@ -8,7 +8,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import java.awt.*;
-import java.io.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -38,28 +37,6 @@ public class MainLayoutGUI {
     private JComboBox<String> filterYearCombobox;
     private JButton clearButton;
     public static ContentScroll contentTable = new ContentScroll(mangaArray);
-
-    /*
-     * Gridbaglayout Properties:
-     * - [gridX, gridY] = [row, column]:
-     *   - The gridX means that which position are the elements are placed in the gird layout
-     *   - The gridY means that which column are the elements are placed in the gird layout
-     *
-     * */
-
-    /*
-     * TODO:
-     *  - Row select edit (CHECKED)
-     *  - Delete book (CHECKED)
-     *  - Add Try Catch (almost)
-     *  - Advance Search if the book is not found in database, it will search on manga-dex
-     *  - Next to search bar add a search option for title or author or type (CHECKED)
-     *  - Fix edit warning messages and change status, genre, year field to combo box. (CHECKED)
-     *  -
-     *  -
-     *  -
-     *  - You need more sleep... Brother....
-     * */
 
     public MainLayoutGUI() {
         Transition transition = new Transition();

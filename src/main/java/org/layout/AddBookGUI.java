@@ -127,8 +127,8 @@ public class AddBookGUI {
                     Objects.requireNonNull(yearCombobox.getSelectedItem()).toString(),
                     descriptionTextArea.getText(), "Not available", chapter));
 
-            try (Connection connection = DriverManager.getConnection(SQLConnectionString.getConnectionString())) {
-                PreparedStatement authorQuery = connection.prepareStatement("Select * from Author where " + "Author.Name = ?");
+            try {
+                PreparedStatement authorQuery = SQLConnectionString.getConnection().prepareStatement("Select * from Author where " + "Author.Name = ?");
                 authorQuery.setString(1, authorInput.getText());
                 ResultSet authorRes = authorQuery.executeQuery();
                 String authorUUID = UUID.randomUUID().toString();
@@ -136,13 +136,13 @@ public class AddBookGUI {
                 if (authorRes.next()) {
                     authorUUID = authorRes.getString(1);
                 } else {
-                    PreparedStatement insertAuthorQuery = connection.prepareStatement("Insert into Author (ID, Name, State) values (?, ?, '0')");
+                    PreparedStatement insertAuthorQuery = SQLConnectionString.getConnection().prepareStatement("Insert into Author (ID, Name, State) values (?, ?, '0')");
                     insertAuthorQuery.setString(1, authorUUID);
                     insertAuthorQuery.setString(2, authorInput.getText());
                     insertAuthorQuery.execute();
                 }
 
-                PreparedStatement insertBookQuery = connection.prepareStatement(
+                PreparedStatement insertBookQuery = SQLConnectionString.getConnection().prepareStatement(
                         "Insert into Book (ID, Title, Author, Genre, Status, YearReleased, Description, Cover, Chapter, State) values " +
                                 "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                 );
@@ -158,7 +158,7 @@ public class AddBookGUI {
                 insertBookQuery.setString(9, chapter + "");
                 insertBookQuery.setString(10, "0");
                 insertBookQuery.executeUpdate();
-            } catch (SQLException ignored) {
+            } catch (Exception ignored) {
             }
 
             titleInput.setText("");

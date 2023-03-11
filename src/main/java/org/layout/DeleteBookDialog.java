@@ -67,13 +67,11 @@ public class DeleteBookDialog extends JDialog {
                     JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
 
             if (o == JOptionPane.YES_OPTION) {
-                try (Connection connection = DriverManager.getConnection(SQLConnectionString.getConnectionString())) {
-                    PreparedStatement authorQuery = connection.prepareStatement("update book set book.State = 1 where ID = ?");
+                try {
+                    PreparedStatement authorQuery = SQLConnectionString.getConnection().prepareStatement("update book set book.State = 1 where ID = ?");
                     authorQuery.setString(1, mangaArray.get(index).getUuid());
                     authorQuery.executeUpdate();
-                }
-                catch (SQLException error) {
-                    error.printStackTrace();
+                } catch (Exception ignored) {
                 }
 
                 mangaArray.remove(index);

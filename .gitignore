@@ -4,6 +4,7 @@ target/
 !**/src/test/**/target/
 book-data.txt
 db/SQLConnectionString.java
+app.properties
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

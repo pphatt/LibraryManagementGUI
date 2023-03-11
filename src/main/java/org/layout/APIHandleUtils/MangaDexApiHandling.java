@@ -122,8 +122,8 @@ public class MangaDexApiHandling {
                     .thenAccept(MangaDexApiHandling::getMangaChapter)
                     .join();
 
-            try (Connection connection = DriverManager.getConnection(SQLConnectionString.getConnectionString())) {
-                PreparedStatement checkBookIDDup = connection.prepareStatement("Select * from Book where " + "Book.ID = ?");
+            try {
+                PreparedStatement checkBookIDDup = SQLConnectionString.getConnection().prepareStatement("Select * from Book where " + "Book.ID = ?");
                 checkBookIDDup.setString(1, uuid);
                 ResultSet checkBookIDDupRes = checkBookIDDup.executeQuery();
 
@@ -135,18 +135,18 @@ public class MangaDexApiHandling {
                     continue;
                 }
 
-                PreparedStatement authorQuery = connection.prepareStatement("Select * from Author where " + "Author.ID = ?");
+                PreparedStatement authorQuery = SQLConnectionString.getConnection().prepareStatement("Select * from Author where " + "Author.ID = ?");
                 authorQuery.setString(1, authorID);
                 ResultSet authorRes = authorQuery.executeQuery();
 
                 if (!authorRes.next()) {
-                    PreparedStatement insertAuthorQuery = connection.prepareStatement("Insert into Author (ID, Name, State) values (?, ?, '0')");
+                    PreparedStatement insertAuthorQuery = SQLConnectionString.getConnection().prepareStatement("Insert into Author (ID, Name, State) values (?, ?, '0')");
                     insertAuthorQuery.setString(1, authorID);
                     insertAuthorQuery.setString(2, author);
                     insertAuthorQuery.executeUpdate();
                 }
 
-                PreparedStatement insertBookQuery = connection.prepareStatement(
+                PreparedStatement insertBookQuery = SQLConnectionString.getConnection().prepareStatement(
                         "Insert into Book (ID, Title, Author, Genre, Status, YearReleased, Description, Cover, Chapter, State) values " +
                                 "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                 );
@@ -162,8 +162,7 @@ public class MangaDexApiHandling {
                 insertBookQuery.setString(9, chapterArray.get(i).toString());
                 insertBookQuery.setString(10, "0");
                 insertBookQuery.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
             }
 
             a.addRow(new Object[]{uuid, title, author, genre, status, yearRelease, chapterArray.get(i)});
@@ -172,8 +171,8 @@ public class MangaDexApiHandling {
             mangaArray.add(new Manga(uuid, title, author, genre, status, yearRelease, description, coverPath, chapterArray.get(i)));
         }
 
-        try (Connection connection = DriverManager.getConnection(SQLConnectionString.getConnectionString())) {
-            PreparedStatement retrieveBook = connection.prepareStatement(
+        try {
+            PreparedStatement retrieveBook = SQLConnectionString.getConnection().prepareStatement(
                     "Select Book.ID, Book.Title, Author.Name, Book.Genre, Book.Status, Book.YearReleased, Book.Description, Book.Cover, Book.Chapter from Book, Author where Book.Author = Author.ID");
             ResultSet retrieveBookRes = retrieveBook.executeQuery();
 
@@ -198,8 +197,7 @@ public class MangaDexApiHandling {
                             Integer.parseInt(retrieveBookRes.getString(9))));
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
 
         state = true;
