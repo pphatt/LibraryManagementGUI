@@ -14,6 +14,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 import org.layout.db.SQLConnectionString;
 
@@ -37,7 +39,7 @@ public class MangaDexApiHandling {
     }
 
     public static void getManga(String responseBody) {
-        DefaultTableModel a = (DefaultTableModel) MainLayoutGUI.contentTable.getTable().getModel();
+        DefaultTableModel model = (DefaultTableModel) MainLayoutGUI.contentTable.getTable().getModel();
         JSONObject jsonObject = new JSONObject(responseBody);
         JSONArray mangas = new JSONArray(jsonObject.getJSONArray("data"));
 
@@ -142,42 +144,9 @@ public class MangaDexApiHandling {
                     .join();
 
             try {
-                PreparedStatement checkBookIDDup = SQLConnectionString.getConnection().prepareStatement("Select * from Book where " + "Book.ID = ?");
-                checkBookIDDup.setString(1, uuid);
-                ResultSet checkBookIDDupRes = checkBookIDDup.executeQuery();
-
-                if (checkBookIDDupRes.next()) {
-                    if (Objects.equals(checkBookIDDupRes.getString(10), "1")) {
-                        continue;
-                    }
-
-                    a.addRow(new Object[]{uuid, title, author, type, status, yearRelease, chapterArray.get(i)});
-                    MainLayoutGUI.contentTable.getTable().setModel(a);
-
-                    mangaArray.add(new Manga(uuid, title, author, type, status, yearRelease, description, coverPath, chapterArray.get(i)));
-                    continue;
-                }
-
-                PreparedStatement authorQuery = SQLConnectionString.getConnection().prepareStatement("Select * from Author where " + "Author.ID = ?");
-                authorQuery.setString(1, authorID);
-                ResultSet authorRes = authorQuery.executeQuery();
-
-                if (!authorRes.next()) {
-                    PreparedStatement insertAuthorQuery = SQLConnectionString.getConnection().prepareStatement("Insert into Author (ID, Name, State) values (?, ?, '0')");
-                    insertAuthorQuery.setString(1, authorID);
-                    insertAuthorQuery.setString(2, author);
-                    insertAuthorQuery.executeUpdate();
-                }
-
-                PreparedStatement typeQuery = SQLConnectionString.getConnection().prepareStatement("Select * from Type where " + "Type.Name = ?");
-                typeQuery.setString(1, type);
-                ResultSet typeRes = typeQuery.executeQuery();
-
-                if (!typeRes.next()) {
-                    PreparedStatement insertTypeQuery = SQLConnectionString.getConnection().prepareStatement("Insert into Type (Name) values (?)");
-                    insertTypeQuery.setString(1, type);
-                    insertTypeQuery.executeUpdate();
-                }
+                checkBookAlreadyExists(model, uuid, title, author, type, status, yearRelease, description, coverPath, chapterArray.get(i));
+                checkDBAuthor(authorID, author);
+                checkDBType(type);
 
                 for (ArrayList<String> strings : tag) {
                     PreparedStatement checkGenre = SQLConnectionString.getConnection().prepareStatement("Select * from Genre where ID = ?");
@@ -197,38 +166,59 @@ public class MangaDexApiHandling {
                     }
 
                     /*
-                    * TODO:
-                    *  - update genre for book
-                    *
-                    * */
+                     * TODO:
+                     *  - update genre for book
+                     *
+                     * */
                     tags.add(strings);
                 }
 
-                PreparedStatement insertBookQuery = SQLConnectionString.getConnection().prepareStatement(
-                        "Insert into Book (ID, Title, Author, Type, Status, YearReleased, Description, Cover, Chapter, State) values " +
-                                "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-                );
-
-                insertBookQuery.setString(1, uuid);
-                insertBookQuery.setString(2, title);
-                insertBookQuery.setString(3, authorID);
-                insertBookQuery.setString(4, "1");
-                insertBookQuery.setString(5, status);
-                insertBookQuery.setString(6, yearRelease);
-                insertBookQuery.setString(7, description);
-                insertBookQuery.setString(8, coverPath);
-                insertBookQuery.setString(9, chapterArray.get(i).toString());
-                insertBookQuery.setString(10, "0");
-                insertBookQuery.executeUpdate();
+                addBookToDB(uuid, title, authorID, status, yearRelease, description, coverPath, chapterArray.get(i).toString());
             } catch (Exception e) {
             }
 
-            a.addRow(new Object[]{uuid, title, author, type, status, yearRelease, chapterArray.get(i)});
-            MainLayoutGUI.contentTable.getTable().setModel(a);
+            model.addRow(new Object[]{uuid, title, author, type, status, yearRelease, chapterArray.get(i)});
+            MainLayoutGUI.contentTable.getTable().setModel(model);
 
             mangaArray.add(new Manga(uuid, title, author, type, status, yearRelease, description, coverPath, chapterArray.get(i)));
         }
 
+        checkDBBook();
+        state = true;
+    }
+
+    public static void checkDBType(String type) {
+        try {
+            PreparedStatement typeQuery = SQLConnectionString.getConnection().prepareStatement("Select * from Type where " + "Type.Name = ?");
+            typeQuery.setString(1, type);
+            ResultSet typeRes = typeQuery.executeQuery();
+
+            if (!typeRes.next()) {
+                PreparedStatement insertTypeQuery = SQLConnectionString.getConnection().prepareStatement("Insert into Type (Name) values (?)");
+                insertTypeQuery.setString(1, type);
+                insertTypeQuery.executeUpdate();
+            }
+        } catch (SQLException ignored) {
+        }
+    }
+
+    public static void checkDBAuthor(String authorID, String authorName) {
+        try {
+            PreparedStatement authorQuery = SQLConnectionString.getConnection().prepareStatement("Select * from Author where " + "Author.ID = ?");
+            authorQuery.setString(1, authorID);
+            ResultSet authorRes = authorQuery.executeQuery();
+
+            if (!authorRes.next()) {
+                PreparedStatement insertAuthorQuery = SQLConnectionString.getConnection().prepareStatement("Insert into Author (ID, Name, State) values (?, ?, '0')");
+                insertAuthorQuery.setString(1, authorID);
+                insertAuthorQuery.setString(2, authorName);
+                insertAuthorQuery.executeUpdate();
+            }
+        } catch (SQLException ignored) {
+        }
+    }
+
+    public static void checkDBBook() {
         try {
             PreparedStatement retrieveBook = SQLConnectionString.getConnection().prepareStatement(
                     "Select Book.ID, Book.Title, Author.Name, Book.Type, Book.Status, Book.YearReleased, Book.Description, Book.Cover, Book.Chapter, Book.State from Book, Author where Book.Author = Author.ID");
@@ -262,8 +252,53 @@ public class MangaDexApiHandling {
             }
         } catch (Exception ignored) {
         }
+    }
 
-        state = true;
+    public static Boolean checkBookAlreadyExists(DefaultTableModel model, String uuid, String title, String author, String type, String status, String yearRelease, String description, String coverPath, Integer chapter) {
+        try {
+            PreparedStatement checkBookIDDup = SQLConnectionString.getConnection().prepareStatement("Select * from Book where " + "Book.ID = ?");
+            checkBookIDDup.setString(1, uuid);
+            ResultSet checkBookIDDupRes = checkBookIDDup.executeQuery();
+
+            if (checkBookIDDupRes.next()) {
+                if (Objects.equals(checkBookIDDupRes.getString(10), "1")) {
+                    return true;
+                }
+
+                model.addRow(new Object[]{uuid, title, author, type, status, yearRelease, chapter});
+                MainLayoutGUI.contentTable.getTable().setModel(model);
+
+                mangaArray.add(new Manga(uuid, title, author, type, status, yearRelease, description, coverPath, chapter));
+                return true;
+            }
+
+            return false;
+        } catch (SQLException ignored) {
+        }
+
+        return null;
+    }
+
+    public static void addBookToDB(String uuid, String title, String authorID, String status, String yearRelease, String description, String coverPath, String chapter) {
+        try {
+            PreparedStatement insertBookQuery = SQLConnectionString.getConnection().prepareStatement(
+                    "Insert into Book (ID, Title, Author, Type, Status, YearReleased, Description, Cover, Chapter, State) values " +
+                            "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            );
+
+            insertBookQuery.setString(1, uuid);
+            insertBookQuery.setString(2, title);
+            insertBookQuery.setString(3, authorID);
+            insertBookQuery.setString(4, "1");
+            insertBookQuery.setString(5, status);
+            insertBookQuery.setString(6, yearRelease);
+            insertBookQuery.setString(7, description);
+            insertBookQuery.setString(8, coverPath);
+            insertBookQuery.setString(9, chapter);
+            insertBookQuery.setString(10, "0");
+            insertBookQuery.executeUpdate();
+        } catch (SQLException ignored) {
+        }
     }
 
     public static void getMangaChapter(String responseBody) {
