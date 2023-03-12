@@ -39,6 +39,7 @@ create table BookGenre
 (
     BookID  nvarchar(36) not null,
     GenreID nvarchar(36) not null,
+    State int check (State = 0 or State = 1) not null,
 )
 
 alter table Book

@@ -14,8 +14,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.concurrent.Callable;
-import java.util.function.Function;
 
 import org.layout.db.SQLConnectionString;
 
@@ -144,36 +142,17 @@ public class MangaDexApiHandling {
                     .join();
 
             try {
-                checkBookAlreadyExists(model, uuid, title, author, type, status, yearRelease, description, coverPath, chapterArray.get(i));
+                if (Boolean.TRUE.equals(checkBookAlreadyExists(model, uuid, title, author, type, status, yearRelease,
+                        description, coverPath, chapterArray.get(i)))) {
+                    continue;
+                }
+
                 checkDBAuthor(authorID, author);
                 checkDBType(type);
 
-                for (ArrayList<String> strings : tag) {
-                    PreparedStatement checkGenre = SQLConnectionString.getConnection().prepareStatement("Select * from Genre where ID = ?");
-                    checkGenre.setString(1, strings.get(0));
-                    ResultSet checkGenreRes = checkGenre.executeQuery();
-
-                    if (!checkGenreRes.next()) {
-                        PreparedStatement insertGenre = SQLConnectionString.getConnection().prepareStatement(
-                                "Insert into Genre (ID, Name, State) values " +
-                                        "(?, ?, ?)"
-                        );
-
-                        insertGenre.setString(1, strings.get(0));
-                        insertGenre.setString(2, strings.get(1));
-                        insertGenre.setString(3, "0");
-                        insertGenre.executeUpdate();
-                    }
-
-                    /*
-                     * TODO:
-                     *  - update genre for book
-                     *
-                     * */
-                    tags.add(strings);
-                }
-
                 addBookToDB(uuid, title, authorID, status, yearRelease, description, coverPath, chapterArray.get(i).toString());
+
+                checkBookGenre(tag, uuid);
             } catch (Exception e) {
             }
 
@@ -252,6 +231,52 @@ public class MangaDexApiHandling {
             }
         } catch (Exception ignored) {
         }
+    }
+
+    public static void checkBookGenre(ArrayList<ArrayList<String>> tag, String uuid) {
+        ArrayList<String> t = new ArrayList<>();
+
+        try {
+            for (ArrayList<String> strings : tag) {
+                PreparedStatement checkGenre = SQLConnectionString.getConnection().prepareStatement("Select * from Genre where ID = ?");
+                checkGenre.setString(1, strings.get(0));
+                ResultSet checkGenreRes = checkGenre.executeQuery();
+
+                if (!checkGenreRes.next()) {
+                    PreparedStatement insertGenre = SQLConnectionString.getConnection().prepareStatement(
+                            "Insert into Genre (ID, Name, State) values " +
+                                    "(?, ?, ?)"
+                    );
+
+                    insertGenre.setString(1, strings.get(0));
+                    insertGenre.setString(2, strings.get(1));
+                    insertGenre.setString(3, "0");
+                    insertGenre.executeUpdate();
+                }
+
+                PreparedStatement checkBookGenreExist = SQLConnectionString.getConnection().prepareStatement("Select * from BookGenre where BookID = ? and GenreID = ?");
+                checkBookGenreExist.setString(1, uuid);
+                checkBookGenreExist.setString(2, strings.get(0));
+                ResultSet checkBookGenreExistRes = checkBookGenreExist.executeQuery();
+
+                if (!checkBookGenreExistRes.next()) {
+                    PreparedStatement insertBookGenre = SQLConnectionString.getConnection().prepareStatement(
+                            "Insert into BookGenre (BookID, GenreID, State) values " +
+                                    "(?, ?, ?)"
+                    );
+
+                    insertBookGenre.setString(1, uuid);
+                    insertBookGenre.setString(2, strings.get(0));
+                    insertBookGenre.setString(3, "0");
+                    insertBookGenre.executeUpdate();
+                }
+
+                t.add(strings.get(1));
+            }
+        } catch (SQLException ignored) {
+        }
+
+        tags.add(t);
     }
 
     public static Boolean checkBookAlreadyExists(DefaultTableModel model, String uuid, String title, String author, String type, String status, String yearRelease, String description, String coverPath, Integer chapter) {
