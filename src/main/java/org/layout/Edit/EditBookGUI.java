@@ -1,8 +1,15 @@
-package org.layout;
+package org.layout.Edit;
+
+import org.layout.ViewDetailsBook;
+import org.layout.db.SQLConnectionString;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Objects;
 
 import static org.layout.APIHandleUtils.MangaDexApiHandling.mangaArray;
@@ -29,14 +36,24 @@ public class EditBookGUI extends JDialog {
     private JButton saveButton;
     private JButton cancelButton;
     private JLabel warningTitleField;
-    private JLabel warningAuthorField;
     private JLabel warningTypeField;
     private JLabel warningStatusField;
     private JLabel warningYearField;
     private JLabel warningDescriptionField;
     private JLabel warningChapterField;
+    private JScrollPane genreDetail;
+    private JPanel editGenreLayout;
+    private JPanel functionLayout;
+    private JPanel genreInnerLayout;
+    private JComboBox genreCombobox;
+    private JButton addButton;
+    private JPanel editAuthorOption;
+    private JButton viewAuthorButton;
+    private JButton createNewAuthorButton;
+    private JButton cancelButton1;
+    private JPanel externalField;
 
-    public EditBookGUI(int index, String title, String author, String genre, String status, String year, String description, String chapter) {
+    public EditBookGUI(int index, String uuid, String title, String author, String genre, String status, String year, String description, String chapter) {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(cancelButton);
@@ -111,7 +128,6 @@ public class EditBookGUI extends JDialog {
 
         saveButton.addActionListener(e -> {
             warningTitleField.setVisible(false);
-            warningAuthorField.setVisible(false);
             warningChapterField.setVisible(false);
 
             if (editTitleField.getText().equals("")) {
@@ -121,16 +137,6 @@ public class EditBookGUI extends JDialog {
             } else if (editTitleField.getText().length() > 256) {
                 warningTitleField.setVisible(true);
                 warningTitleField.setText("* Title max characters is 256");
-                return;
-            }
-
-            if (editAuthorField.getText().equals("")) {
-                warningAuthorField.setVisible(true);
-                warningAuthorField.setText("* Author field must not be empty");
-                return;
-            } else if (editAuthorField.getText().length() > 256) {
-                warningAuthorField.setVisible(true);
-                warningAuthorField.setText("* Author max characters is 256");
                 return;
             }
 
@@ -159,11 +165,100 @@ public class EditBookGUI extends JDialog {
             mangaArray.get(index).setDescription(editDescriptionField.getText().trim().replaceAll("\n", " "));
             mangaArray.get(index).setChapters(newChapter);
 
+            try {
+                PreparedStatement updateBookQuery = SQLConnectionString.getConnection().prepareStatement(
+                        "Update Book set Title = ? and Author = ? and Type = ? and Status = ? and YearReleased = ? and Description = ? and Cover = ? and Chapter = ?" +
+                                "where ID = ?"
+                );
+
+                updateBookQuery.setString(1, editTitleField.getText());
+                updateBookQuery.setString(2, editAuthorField.getText().split(" → ")[1]);
+                updateBookQuery.setString(3, editGenreCombobox.getSelectedItem().toString());
+                updateBookQuery.setString(4, editStatusCombobox.getSelectedItem().toString());
+                updateBookQuery.setString(6, editYearCombobox.getSelectedItem().toString());
+                updateBookQuery.setString(7, editDescriptionField.getText().trim().replaceAll("\n", " "));
+                updateBookQuery.setString(8, newChapter + "");
+                updateBookQuery.setString(9, uuid);
+                updateBookQuery.executeUpdate();
+            } catch (SQLException ignored) {
+            }
+
             JOptionPane.showMessageDialog(mainLayout,
                     "Edited Successfully", "Notify message",
                     JOptionPane.INFORMATION_MESSAGE);
 
             onCancel();
+        });
+
+        viewAuthorButton.addActionListener(e -> {
+            externalField.removeAll();
+            ViewAuthor view = new ViewAuthor(author);
+
+            GridBagConstraints constraints = new GridBagConstraints();
+
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            constraints.weightx = 1;
+            constraints.weighty = 1;
+            constraints.fill = GridBagConstraints.BOTH;
+            constraints.anchor = GridBagConstraints.FIRST_LINE_START;
+
+            externalField.add(view.getMainLayout(), constraints);
+            externalField.repaint();
+            externalField.revalidate();
+            view.getMainLayout().setVisible(true);
+
+            view.getAddButton().addActionListener(event -> {
+                editAuthorField.setText(author + " → " + Objects.requireNonNull(view.getAuthorCombobox().getSelectedItem()));
+            });
+        });
+
+        createNewAuthorButton.addActionListener(e -> {
+            externalField.removeAll();
+
+            AddNewAuthor aa = new AddNewAuthor();
+
+            GridBagConstraints constraints = new GridBagConstraints();
+
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            constraints.weightx = 1;
+            constraints.weighty = 1;
+            constraints.fill = GridBagConstraints.BOTH;
+            constraints.anchor = GridBagConstraints.FIRST_LINE_START;
+
+            externalField.add(aa.getMainLayout(), constraints);
+            externalField.repaint();
+            externalField.revalidate();
+            aa.getMainLayout().setVisible(true);
+
+            aa.getAuthorName().getDocument().addDocumentListener(new DocumentListener() {
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                    renderTableOnSearch();
+                }
+
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    renderTableOnSearch();
+                }
+
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    renderTableOnSearch();
+                }
+
+                public void renderTableOnSearch() {
+                    editAuthorField.setText(author + " → " + aa.getAuthorName().getText());
+                }
+            });
+        });
+
+        cancelButton1.addActionListener(e -> {
+            externalField.removeAll();
+            externalField.repaint();
+            externalField.revalidate();
+            editAuthorField.setText(author);
         });
 
         cancelButton.addActionListener(e -> onCancel());

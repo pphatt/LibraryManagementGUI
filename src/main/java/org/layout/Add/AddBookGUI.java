@@ -1,12 +1,9 @@
-package org.layout;
+package org.layout.Add;
 
 import org.layout.APIHandleUtils.Manga;
 import org.layout.db.SQLConnectionString;
 
 import javax.swing.*;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.sql.*;
 import java.util.Objects;
 import java.util.UUID;

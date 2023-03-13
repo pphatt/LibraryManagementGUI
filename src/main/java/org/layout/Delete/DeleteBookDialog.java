@@ -1,4 +1,4 @@
-package org.layout;
+package org.layout.Delete;
 
 import org.layout.db.SQLConnectionString;
 

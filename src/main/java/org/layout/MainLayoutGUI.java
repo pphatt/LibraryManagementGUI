@@ -2,6 +2,10 @@ package org.layout;
 
 import org.layout.APIHandleUtils.Manga;
 import org.layout.APIHandleUtils.MangaDexApiHandling;
+import org.layout.Add.AddBookDialog;
+import org.layout.Add.AddBookGUI;
+import org.layout.Delete.DeleteBookDialog;
+import org.layout.Edit.EditBookGUI;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -167,7 +171,7 @@ public class MainLayoutGUI {
                 }
             }
 
-            EditBookGUI editBookGUI = new EditBookGUI(indx, title, author, genre, status, yearRelease, mangaArray.get(indx).getDescription(), chapter);
+            EditBookGUI editBookGUI = new EditBookGUI(indx, uuid, title, author, genre, status, yearRelease, mangaArray.get(indx).getDescription(), chapter);
             editBookGUI.setLocationRelativeTo(MainPanel);
             editBookGUI.setVisible(true);
 

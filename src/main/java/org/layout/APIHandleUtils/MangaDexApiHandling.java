@@ -161,6 +161,7 @@ public class MangaDexApiHandling {
 
                 checkBookGenre(tag, uuid);
             } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
 
             model.addRow(new Object[]{uuid, title, author, type, status, yearRelease, chapterArray.get(i)});
@@ -207,7 +208,7 @@ public class MangaDexApiHandling {
     public static void checkDBBook() {
         try {
             PreparedStatement retrieveBook = SQLConnectionString.getConnection().prepareStatement(
-                    "Select Book.ID, Book.Title, Author.Name, Book.Type, Book.Status, Book.YearReleased, Book.Description, Book.Cover, Book.Chapter, Book.State from Book, Author where Book.Author = Author.ID");
+                    "Select Book.ID, Book.Title, Author.Name, Type.Name, Book.Status, Book.YearReleased, Book.Description, Book.Cover, Book.Chapter, Book.State from Book, Author, Type where Book.Author = Author.ID and Book.Type = Type.ID");
             ResultSet retrieveBookRes = retrieveBook.executeQuery();
 
             while (retrieveBookRes.next()) {
@@ -225,7 +226,8 @@ public class MangaDexApiHandling {
                 }
 
                 if (!c) {
-                    mangaArray.add(new Manga(retrieveBookRes.getString(1),
+                    mangaArray.add(new Manga(
+                            retrieveBookRes.getString(1),
                             retrieveBookRes.getString(2),
                             retrieveBookRes.getString(3),
                             retrieveBookRes.getString(4),
@@ -233,10 +235,23 @@ public class MangaDexApiHandling {
                             retrieveBookRes.getString(6),
                             retrieveBookRes.getString(7),
                             retrieveBookRes.getString(8),
-                            Integer.parseInt(retrieveBookRes.getString(9))));
+                            Integer.parseInt(retrieveBookRes.getString(9))
+                    ));
+
+                    DefaultTableModel model = (DefaultTableModel) MainLayoutGUI.contentTable.getTable().getModel();
+                    model.addRow(new Object[]{
+                            retrieveBookRes.getString(1),
+                            retrieveBookRes.getString(2),
+                            retrieveBookRes.getString(3),
+                            retrieveBookRes.getString(4),
+                            retrieveBookRes.getString(5),
+                            retrieveBookRes.getString(6),
+                            retrieveBookRes.getString(9)
+                    });
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
