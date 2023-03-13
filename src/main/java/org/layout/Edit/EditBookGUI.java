@@ -9,6 +9,7 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
 
@@ -157,8 +158,16 @@ public class EditBookGUI extends JDialog {
                 }
             }
 
+            String newAuthor = "";
+
+            if (editAuthorField.equals(author)) {
+                newAuthor = author;
+            } else {
+                newAuthor = editAuthorField.getText().split(" → ")[1];
+            }
+
             mangaArray.get(index).setTitle(editTitleField.getText());
-            mangaArray.get(index).setAuthor(editAuthorField.getText());
+            mangaArray.get(index).setAuthor(newAuthor);
             mangaArray.get(index).setGenre(Objects.requireNonNull(editGenreCombobox.getSelectedItem()).toString());
             mangaArray.get(index).setStatus(Objects.requireNonNull(editStatusCombobox.getSelectedItem()).toString());
             mangaArray.get(index).setYearRelease(Objects.requireNonNull(editYearCombobox.getSelectedItem()).toString());
@@ -166,21 +175,27 @@ public class EditBookGUI extends JDialog {
             mangaArray.get(index).setChapters(newChapter);
 
             try {
-                PreparedStatement updateBookQuery = SQLConnectionString.getConnection().prepareStatement(
-                        "Update Book set Title = ? and Author = ? and Type = ? and Status = ? and YearReleased = ? and Description = ? and Cover = ? and Chapter = ?" +
-                                "where ID = ?"
-                );
+                PreparedStatement authorQuery = SQLConnectionString.getConnection().prepareStatement("Select * from Author where Name = ?");
+                authorQuery.setString(1, newAuthor);
+                ResultSet authorQueryRes = authorQuery.executeQuery();
 
-                updateBookQuery.setString(1, editTitleField.getText());
-                updateBookQuery.setString(2, editAuthorField.getText().split(" → ")[1]);
-                updateBookQuery.setString(3, editGenreCombobox.getSelectedItem().toString());
-                updateBookQuery.setString(4, editStatusCombobox.getSelectedItem().toString());
-                updateBookQuery.setString(6, editYearCombobox.getSelectedItem().toString());
-                updateBookQuery.setString(7, editDescriptionField.getText().trim().replaceAll("\n", " "));
-                updateBookQuery.setString(8, newChapter + "");
-                updateBookQuery.setString(9, uuid);
-                updateBookQuery.executeUpdate();
-            } catch (SQLException ignored) {
+                if (authorQueryRes.next()) {
+                    PreparedStatement updateBookQuery = SQLConnectionString.getConnection().prepareStatement(
+                            "Update Book set Title = ?, Author = ?, Type = ?, Status = ?, YearReleased = ?, Description = ?, Chapter = ? where ID = ?"
+                    );
+
+                    updateBookQuery.setString(1, editTitleField.getText());
+                    updateBookQuery.setString(2, authorQueryRes.getString(1));
+                    updateBookQuery.setString(3, "1");
+                    updateBookQuery.setString(4, editStatusCombobox.getSelectedItem().toString());
+                    updateBookQuery.setString(5, editYearCombobox.getSelectedItem().toString());
+                    updateBookQuery.setString(6, editDescriptionField.getText().trim().replaceAll("\n", " "));
+                    updateBookQuery.setString(7, newChapter + "");
+                    updateBookQuery.setString(8, uuid);
+                    updateBookQuery.executeUpdate();
+                }
+            } catch (SQLException error) {
+                System.out.println(error.getMessage());
             }
 
             JOptionPane.showMessageDialog(mainLayout,

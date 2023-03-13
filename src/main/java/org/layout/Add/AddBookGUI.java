@@ -84,7 +84,7 @@ public class AddBookGUI {
             }
 
             for (Manga manga : mangaArray) {
-                if (manga.getTitle().contains(titleInput.getText())) {
+                if (manga.getTitle().equals(titleInput.getText())) {
                     warningTitle.setVisible(true);
                     warningTitle.setText("* Book is already in the database");
                     return;
