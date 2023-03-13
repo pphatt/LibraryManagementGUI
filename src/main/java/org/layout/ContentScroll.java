@@ -51,6 +51,7 @@ public class ContentScroll extends JPanel {
 
         cellSelectionModel.addListSelectionListener(e -> {
             int selectedRow = contentTable.getSelectedRow();
+            String uuid = (String) model.getValueAt(selectedRow, 0);
             String title = (String) contentTable.getValueAt(selectedRow, 0);
             String author = (String) contentTable.getValueAt(selectedRow, 1);
             String genre = (String) contentTable.getValueAt(selectedRow, 2);
@@ -59,7 +60,7 @@ public class ContentScroll extends JPanel {
             String description = mangaArray.get(selectedRow).getDescription();
             String chapter = contentTable.getValueAt(selectedRow, 5).toString();
 
-            ViewDetailsBook viewDetailsDialog = new ViewDetailsBook(title, author, genre, status, yearRelease, description, chapter);
+            ViewDetailsBook viewDetailsDialog = new ViewDetailsBook(uuid, title, author, genre, status, yearRelease, description, chapter);
             viewDetailsDialog.setLocationRelativeTo(contentScroll);
             viewDetailsDialog.setVisible(true);
         });

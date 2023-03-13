@@ -1,8 +1,13 @@
 package org.layout;
 
+import org.layout.db.SQLConnectionString;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class ViewDetailsBook extends JDialog {
     private JPanel contentPane;
@@ -23,8 +28,10 @@ public class ViewDetailsBook extends JDialog {
     private JPanel chapterLayout;
     private JScrollPane scrollViewDetail;
     private JPanel bookDetailsLayout;
+    private JScrollPane genreLayout;
+    private JPanel genreInnerLayout;
 
-    public ViewDetailsBook(String title, String author, String type, String status, String year, String description, String chapter) {
+    public ViewDetailsBook(String uuid, String title, String author, String type, String status, String year, String description, String chapter) {
         setContentPane(contentPane);
         setModal(true);
         setTitle("View Book Details: " + title);
@@ -40,6 +47,38 @@ public class ViewDetailsBook extends JDialog {
         bookDescriptionDetail.setEditable(false);
 
         bookChapterDetail.setText(chapter);
+
+        try {
+            PreparedStatement bookGenreQuery = SQLConnectionString.getConnection().prepareStatement("Select * from BookGenre where BookID = ?");
+            bookGenreQuery.setString(1, uuid);
+            ResultSet bookGenreQueryRes = bookGenreQuery.executeQuery();
+
+            while (bookGenreQueryRes.next()) {
+                PreparedStatement genre = SQLConnectionString.getConnection().prepareStatement("Select * from Genre where ID = ?");
+                genre.setString(1, bookGenreQueryRes.getString(2));
+                ResultSet genreRes = genre.executeQuery();
+
+                int count = 0;
+
+                while (genreRes.next()) {
+                    JLabel label = new JLabel(genreRes.getString(2));
+
+                    GridBagConstraints constraints = new GridBagConstraints();
+
+                    constraints.gridy = count;
+                    constraints.weightx = 1;
+                    constraints.weighty = 0;
+                    constraints.ipadx = 4;
+                    constraints.ipady = 4;
+                    constraints.fill = GridBagConstraints.BOTH;
+
+                    genreInnerLayout.add(label, constraints);
+                    count++;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
