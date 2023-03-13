@@ -1,9 +1,10 @@
 package org.layout.Edit;
 
-import org.layout.ViewDetailsBook;
 import org.layout.db.SQLConnectionString;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
@@ -11,6 +12,7 @@ import java.awt.event.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Objects;
 
 import static org.layout.APIHandleUtils.MangaDexApiHandling.mangaArray;
@@ -24,7 +26,7 @@ public class EditBookGUI extends JDialog {
     private JPanel editAuthorLayout;
     private JTextField editAuthorField;
     private JPanel editTypeLayout;
-    private JComboBox<String> editGenreCombobox;
+    private JComboBox<String> editTypeCombobox;
     private JPanel editStatusLayout;
     private JComboBox<String> editStatusCombobox;
     private JPanel editYearLayout;
@@ -46,15 +48,17 @@ public class EditBookGUI extends JDialog {
     private JPanel editGenreLayout;
     private JPanel functionLayout;
     private JPanel genreInnerLayout;
-    private JComboBox genreCombobox;
+    private JComboBox<String> genreCombobox;
     private JButton addButton;
     private JPanel editAuthorOption;
     private JButton viewAuthorButton;
     private JButton createNewAuthorButton;
     private JButton cancelButton1;
     private JPanel externalField;
+    private ArrayList<String> newGenres = new ArrayList<>();
+    public int count = 0;
 
-    public EditBookGUI(int index, String uuid, String title, String author, String genre, String status, String year, String description, String chapter) {
+    public EditBookGUI(int index, String uuid, String title, String author, String type, String status, String year, String description, String chapter) {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(cancelButton);
@@ -62,7 +66,7 @@ public class EditBookGUI extends JDialog {
         setTitle("Edit book: " + title);
         setSize(new Dimension(800, 500));
 
-        String[] genreItem = {"manga", "science", "adventure", "slice of life"};
+        String[] typeItem = {"manga"};
         String[] statusItem = {"ongoing", "completed", "hiatus", "cancelled"};
         String[] yearItem = new String[23];
 
@@ -73,18 +77,18 @@ public class EditBookGUI extends JDialog {
         editTitleField.setText(title);
         editAuthorField.setText(author);
 
-        DefaultComboBoxModel<String> genreComboboxModel = new DefaultComboBoxModel<>(genreItem);
+        DefaultComboBoxModel<String> genreComboboxModel = new DefaultComboBoxModel<>(typeItem);
         int getCurrentGenreIndex = 0;
 
-        for (int i = 0; i < genreItem.length; i++) {
-            if (genreItem[i].equals(genre)) {
+        for (int i = 0; i < typeItem.length; i++) {
+            if (typeItem[i].equals(type)) {
                 getCurrentGenreIndex = i;
                 break;
             }
         }
 
-        editGenreCombobox.setModel(genreComboboxModel);
-        editGenreCombobox.setSelectedIndex(getCurrentGenreIndex);
+        editTypeCombobox.setModel(genreComboboxModel);
+        editTypeCombobox.setSelectedIndex(getCurrentGenreIndex);
 
         DefaultComboBoxModel<String> statusComboboxModel = new DefaultComboBoxModel<>(statusItem);
         int getCurrentStatusIndex = 0;
@@ -114,6 +118,61 @@ public class EditBookGUI extends JDialog {
 
         editDescriptionField.setText(description);
         editChapterField.setText(chapter);
+
+        ArrayList<String> exceptions = new ArrayList<>();
+
+        try {
+            PreparedStatement bookGenreQuery = SQLConnectionString.getConnection().prepareStatement("Select * from BookGenre where BookID = ?");
+            bookGenreQuery.setString(1, uuid);
+            ResultSet bookGenreQueryRes = bookGenreQuery.executeQuery();
+
+            while (bookGenreQueryRes.next()) {
+                PreparedStatement genre = SQLConnectionString.getConnection().prepareStatement("Select * from Genre where ID = ?");
+                genre.setString(1, bookGenreQueryRes.getString(2));
+                ResultSet genreRes = genre.executeQuery();
+
+                while (genreRes.next()) {
+                    JLabel label = new JLabel(genreRes.getString(2));
+
+                    JPanel panel = new JPanel();
+                    panel.setLayout(new GridBagLayout());
+                    Border border = BorderFactory.createLineBorder(Color.black);
+                    Border margin = new EmptyBorder(5, 5, 5, 5);
+                    panel.setBorder(BorderFactory.createCompoundBorder(border, margin));
+
+                    GridBagConstraints constraints = new GridBagConstraints();
+
+                    constraints.gridx = count;
+                    constraints.weightx = 1;
+                    constraints.weighty = 0;
+                    constraints.ipadx = 4;
+                    constraints.ipady = 4;
+                    constraints.insets = new Insets(0, 0, 0, 10);
+                    constraints.fill = GridBagConstraints.BOTH;
+
+                    panel.add(label);
+                    genreInnerLayout.add(panel, constraints);
+                    count++;
+                    exceptions.add(genreRes.getString(2));
+                }
+            }
+
+            PreparedStatement genreQuery = SQLConnectionString.getConnection().prepareStatement("Select * from Genre");
+            ResultSet genreQueryRes = genreQuery.executeQuery();
+
+            ArrayList<String> genre = new ArrayList<>();
+
+            while (genreQueryRes.next()) {
+                genre.add(genreQueryRes.getString(2));
+            }
+
+            genre.removeAll(exceptions);
+
+            DefaultComboBoxModel<String> genreModel = new DefaultComboBoxModel<>(genre.toArray(new String[0]));
+            genreCombobox.setModel(genreModel);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -158,7 +217,7 @@ public class EditBookGUI extends JDialog {
                 }
             }
 
-            String newAuthor = "";
+            String newAuthor;
 
             if (editAuthorField.equals(author)) {
                 newAuthor = author;
@@ -168,7 +227,7 @@ public class EditBookGUI extends JDialog {
 
             mangaArray.get(index).setTitle(editTitleField.getText());
             mangaArray.get(index).setAuthor(newAuthor);
-            mangaArray.get(index).setGenre(Objects.requireNonNull(editGenreCombobox.getSelectedItem()).toString());
+            mangaArray.get(index).setGenre(Objects.requireNonNull(editTypeCombobox.getSelectedItem()).toString());
             mangaArray.get(index).setStatus(Objects.requireNonNull(editStatusCombobox.getSelectedItem()).toString());
             mangaArray.get(index).setYearRelease(Objects.requireNonNull(editYearCombobox.getSelectedItem()).toString());
             mangaArray.get(index).setDescription(editDescriptionField.getText().trim().replaceAll("\n", " "));
@@ -277,6 +336,52 @@ public class EditBookGUI extends JDialog {
         });
 
         cancelButton.addActionListener(e -> onCancel());
+
+        addButton.addActionListener(e -> {
+            newGenres.add(Objects.requireNonNull(genreCombobox.getSelectedItem()).toString());
+
+            JLabel label = new JLabel(genreCombobox.getSelectedItem().toString());
+
+            JPanel panel = new JPanel();
+            panel.setLayout(new GridBagLayout());
+            Border border = BorderFactory.createLineBorder(Color.BLUE);
+            Border margin = new EmptyBorder(5, 5, 5, 5);
+            panel.setBorder(BorderFactory.createCompoundBorder(border, margin));
+
+            GridBagConstraints constraints = new GridBagConstraints();
+
+            constraints.gridx = count;
+            constraints.weightx = 1;
+            constraints.weighty = 0;
+            constraints.ipadx = 4;
+            constraints.ipady = 4;
+            constraints.insets = new Insets(0, 0, 0, 10);
+            constraints.fill = GridBagConstraints.BOTH;
+
+            panel.add(label);
+            genreInnerLayout.add(panel, constraints);
+            count++;
+
+            try {
+                PreparedStatement genreQuery = SQLConnectionString.getConnection().prepareStatement("Select * from Genre");
+                ResultSet genreQueryRes = genreQuery.executeQuery();
+
+                ArrayList<String> genre = new ArrayList<>();
+
+                while (genreQueryRes.next()) {
+                    genre.add(genreQueryRes.getString(2));
+                }
+
+                genre.removeAll(exceptions);
+                genre.removeAll(newGenres);
+
+                DefaultComboBoxModel<String> genreModel = new DefaultComboBoxModel<>(genre.toArray(new String[0]));
+                genreCombobox.setModel(genreModel);
+                genreInnerLayout.repaint();
+                genreInnerLayout.revalidate();
+            } catch (SQLException ignored) {
+            }
+        });
     }
 
     private void onCancel() {
