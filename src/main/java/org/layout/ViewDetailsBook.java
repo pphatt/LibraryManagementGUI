@@ -3,6 +3,8 @@ package org.layout;
 import org.layout.db.SQLConnectionString;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.PreparedStatement;
@@ -63,6 +65,12 @@ public class ViewDetailsBook extends JDialog {
                 while (genreRes.next()) {
                     JLabel label = new JLabel(genreRes.getString(2));
 
+                    JPanel panel = new JPanel();
+                    panel.setLayout(new GridBagLayout());
+                    Border border = BorderFactory.createLineBorder(Color.black);
+                    Border margin = new EmptyBorder(5, 5, 5, 5);
+                    panel.setBorder(BorderFactory.createCompoundBorder(border, margin));
+
                     GridBagConstraints constraints = new GridBagConstraints();
 
                     constraints.gridy = count;
@@ -70,9 +78,11 @@ public class ViewDetailsBook extends JDialog {
                     constraints.weighty = 0;
                     constraints.ipadx = 4;
                     constraints.ipady = 4;
+                    constraints.insets = new Insets(0, 0, 0, 10);
                     constraints.fill = GridBagConstraints.BOTH;
 
-                    genreInnerLayout.add(label, constraints);
+                    panel.add(label);
+                    genreInnerLayout.add(panel, constraints);
                     count++;
                 }
             }

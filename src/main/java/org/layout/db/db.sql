@@ -15,6 +15,12 @@ create table Book
     State        int check (State = 0 or State = 1) not null,
 )
 
+create table Playlist
+(
+    BookID nvarchar(36),
+    DateAdd nvarchar(36),
+)
+
 create table Author
 (
     ID    nvarchar(36) primary key,
@@ -37,9 +43,9 @@ create table Genre
 
 create table BookGenre
 (
-    BookID  nvarchar(36) not null,
-    GenreID nvarchar(36) not null,
-    State int check (State = 0 or State = 1) not null,
+    BookID  nvarchar(36)                       not null,
+    GenreID nvarchar(36)                       not null,
+    State   int check (State = 0 or State = 1) not null,
 )
 
 alter table Book
