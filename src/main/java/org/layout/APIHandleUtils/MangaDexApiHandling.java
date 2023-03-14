@@ -23,13 +23,6 @@ public class MangaDexApiHandling {
     public static ArrayList<Integer> chapterArray = new ArrayList<>();
     public static boolean state = false;
 
-    /*
-    * TODO:
-    *  - Think about how to edit with this implementation of sql
-    *  - Perf and refactor code
-    *  - Think about a better approach about access data ? should we use sql query instead of arraylist ? something like that...
-    * */
-
     public MangaDexApiHandling(int amount) {
         HttpClient client = HttpClient.newHttpClient();
 
