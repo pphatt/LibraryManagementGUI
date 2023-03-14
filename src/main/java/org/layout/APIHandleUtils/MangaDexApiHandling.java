@@ -364,19 +364,24 @@ public class MangaDexApiHandling {
     }
 
     public static void getMangaChapter(String responseBody) {
-        JSONObject jsonObject = new JSONObject(responseBody);
-        JSONObject volumes = jsonObject.getJSONObject("volumes");
-        int count = 0;
+        try {
+            JSONObject jsonObject = new JSONObject(responseBody);
+            JSONObject volumes = jsonObject.getJSONObject("volumes");
 
-        Iterator<String> keys = volumes.keys();
+            int count = 0;
 
-        while (keys.hasNext()) {
-            String key = keys.next();
-            String a = volumes.get(key).toString();
-            JSONObject b = new JSONObject(a);
-            count += b.getInt("count");
+            Iterator<String> keys = volumes.keys();
+
+            while (keys.hasNext()) {
+                String key = keys.next();
+                String a = volumes.get(key).toString();
+                JSONObject b = new JSONObject(a);
+                count += b.getInt("count");
+            }
+
+            chapterArray.add(count);
+        } catch (JSONException error) {
+            chapterArray.add(0);
         }
-
-        chapterArray.add(count);
     }
 }
