@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.UUID;
 
 import static org.layout.APIHandleUtils.MangaDexApiHandling.mangaArray;
 
@@ -187,10 +188,10 @@ public class EditBookGUI extends JDialog {
 
             String newAuthor;
 
-            if (editAuthorField.getText().equals(author)) {
+            if (editAuthorField.getText().trim().equals(author)) {
                 newAuthor = author;
             } else {
-                newAuthor = editAuthorField.getText().split(" → ")[1];
+                newAuthor = editAuthorField.getText().split(" → ")[1].trim();
             }
 
             mangaArray.get(index).setTitle(editTitleField.getText());
@@ -201,68 +202,8 @@ public class EditBookGUI extends JDialog {
             mangaArray.get(index).setDescription(editDescriptionField.getText().trim().replaceAll("\n", " "));
             mangaArray.get(index).setChapters(newChapter);
 
-            try {
-                PreparedStatement authorQuery = SQLConnectionString.getConnection().prepareStatement("Select * from Author where Name = ?");
-                authorQuery.setString(1, newAuthor);
-                ResultSet authorQueryRes = authorQuery.executeQuery();
-
-                if (authorQueryRes.next()) {
-                    PreparedStatement updateBookQuery = SQLConnectionString.getConnection().prepareStatement(
-                            "Update Book set Title = ?, Author = ?, Type = ?, Status = ?, YearReleased = ?, Description = ?, Chapter = ? where ID = ?"
-                    );
-
-                    updateBookQuery.setString(1, editTitleField.getText());
-                    updateBookQuery.setString(2, authorQueryRes.getString(1));
-                    updateBookQuery.setString(3, "1");
-                    updateBookQuery.setString(4, editStatusCombobox.getSelectedItem().toString());
-                    updateBookQuery.setString(5, editYearCombobox.getSelectedItem().toString());
-                    updateBookQuery.setString(6, editDescriptionField.getText().trim().replaceAll("\n", " "));
-                    updateBookQuery.setString(7, newChapter + "");
-                    updateBookQuery.setString(8, uuid);
-                    updateBookQuery.executeUpdate();
-                }
-
-                PreparedStatement bookGenreQuery = SQLConnectionString.getConnection().prepareStatement("Select GenreID, Genre.Name from Genre, BookGenre where BookID = ? and Genre.ID = BookGenre.GenreID");
-                bookGenreQuery.setString(1, uuid);
-                ResultSet bookGenreQueryRes = bookGenreQuery.executeQuery();
-
-                while (bookGenreQueryRes.next()) {
-                    if (!exceptions.contains(bookGenreQueryRes.getString(2))) {
-                        PreparedStatement updateBookGenre = SQLConnectionString.getConnection().prepareStatement("Update BookGenre set State = '1' where BookID = ? and GenreID = ?");
-                        updateBookGenre.setString(1, uuid);
-                        updateBookGenre.setString(2, bookGenreQueryRes.getString(1));
-                        updateBookGenre.executeUpdate();
-                    }
-                }
-
-                for (String newGenre : newGenres) {
-                    PreparedStatement genreQuery = SQLConnectionString.getConnection().prepareStatement("Select * from Genre where Name = ?");
-                    genreQuery.setString(1, newGenre);
-                    ResultSet genreQueryRes = genreQuery.executeQuery();
-
-                    if (genreQueryRes.next()) {
-                        PreparedStatement checkBookGenre = SQLConnectionString.getConnection().prepareStatement("Select * from BookGenre where BookID = ? and GenreID = ?");
-                        checkBookGenre.setString(1, uuid);
-                        checkBookGenre.setString(2, genreQueryRes.getString(1));
-                        ResultSet checkBookGenreRes = checkBookGenre.executeQuery();
-
-                        if (checkBookGenreRes.next()) {
-                            PreparedStatement updateBookGenre = SQLConnectionString.getConnection().prepareStatement("Update BookGenre set State = '0' where BookID = ? and GenreID = ?");
-                            updateBookGenre.setString(1, uuid);
-                            updateBookGenre.setString(2, genreQueryRes.getString(1));
-                            updateBookGenre.executeUpdate();
-                            continue;
-                        }
-
-                        PreparedStatement updateBookGenre = SQLConnectionString.getConnection().prepareStatement("Insert into BookGenre (BookID, GenreID, State) Values (?, ?, '0')");
-                        updateBookGenre.setString(1, uuid);
-                        updateBookGenre.setString(2, genreQueryRes.getString(1));
-                        updateBookGenre.executeUpdate();
-                    }
-                }
-            } catch (SQLException error) {
-                System.out.println(error.getMessage());
-            }
+            checkAuthor(newAuthor, uuid, newChapter);
+            checkGenre(uuid);
 
             JOptionPane.showMessageDialog(mainLayout,
                     "Edited Successfully", "Notify message",
@@ -433,6 +374,94 @@ public class EditBookGUI extends JDialog {
                 }
             }
         });
+    }
+
+    public void checkAuthor(String author, String uuid, Integer newChapter) {
+        try {
+            PreparedStatement authorQuery = SQLConnectionString.getConnection().prepareStatement("Select * from Author where Name = ?");
+            authorQuery.setString(1, author);
+            ResultSet authorQueryRes = authorQuery.executeQuery();
+
+            if (authorQueryRes.next()) {
+                updateEditBook(authorQueryRes.getString(1), uuid, newChapter);
+            } else {
+                String _uuid = UUID.randomUUID().toString();
+
+                PreparedStatement insertAuthor = SQLConnectionString.getConnection().prepareStatement(
+                        "Insert into Author (ID, Name, State) values (?, ?, '0')"
+                );
+
+                insertAuthor.setString(1, _uuid);
+                insertAuthor.setString(2, author);
+                insertAuthor.executeUpdate();
+
+                updateEditBook(_uuid, uuid, newChapter);
+            }
+        } catch (SQLException e) {
+        }
+    }
+
+    public void checkGenre(String uuid) {
+        try {
+            PreparedStatement bookGenreQuery = SQLConnectionString.getConnection().prepareStatement("Select GenreID, Genre.Name from Genre, BookGenre where BookID = ? and Genre.ID = BookGenre.GenreID");
+            bookGenreQuery.setString(1, uuid);
+            ResultSet bookGenreQueryRes = bookGenreQuery.executeQuery();
+
+            while (bookGenreQueryRes.next()) {
+                if (!exceptions.contains(bookGenreQueryRes.getString(2))) {
+                    PreparedStatement updateBookGenre = SQLConnectionString.getConnection().prepareStatement("Update BookGenre set State = '1' where BookID = ? and GenreID = ?");
+                    updateBookGenre.setString(1, uuid);
+                    updateBookGenre.setString(2, bookGenreQueryRes.getString(1));
+                    updateBookGenre.executeUpdate();
+                }
+            }
+
+            for (String newGenre : newGenres) {
+                PreparedStatement genreQuery = SQLConnectionString.getConnection().prepareStatement("Select * from Genre where Name = ?");
+                genreQuery.setString(1, newGenre);
+                ResultSet genreQueryRes = genreQuery.executeQuery();
+
+                if (genreQueryRes.next()) {
+                    PreparedStatement checkBookGenre = SQLConnectionString.getConnection().prepareStatement("Select * from BookGenre where BookID = ? and GenreID = ?");
+                    checkBookGenre.setString(1, uuid);
+                    checkBookGenre.setString(2, genreQueryRes.getString(1));
+                    ResultSet checkBookGenreRes = checkBookGenre.executeQuery();
+
+                    if (checkBookGenreRes.next()) {
+                        PreparedStatement updateBookGenre = SQLConnectionString.getConnection().prepareStatement("Update BookGenre set State = '0' where BookID = ? and GenreID = ?");
+                        updateBookGenre.setString(1, uuid);
+                        updateBookGenre.setString(2, genreQueryRes.getString(1));
+                        updateBookGenre.executeUpdate();
+                        continue;
+                    }
+
+                    PreparedStatement updateBookGenre = SQLConnectionString.getConnection().prepareStatement("Insert into BookGenre (BookID, GenreID, State) Values (?, ?, '0')");
+                    updateBookGenre.setString(1, uuid);
+                    updateBookGenre.setString(2, genreQueryRes.getString(1));
+                    updateBookGenre.executeUpdate();
+                }
+            }
+        } catch (SQLException ignored) {
+        }
+    }
+
+    public void updateEditBook(String authorID, String uuid, Integer newChapter) {
+        try {
+            PreparedStatement updateBookQuery = SQLConnectionString.getConnection().prepareStatement(
+                    "Update Book set Title = ?, Author = ?, Type = ?, Status = ?, YearReleased = ?, Description = ?, Chapter = ? where ID = ?"
+            );
+
+            updateBookQuery.setString(1, editTitleField.getText());
+            updateBookQuery.setString(2, authorID);
+            updateBookQuery.setString(3, "1");
+            updateBookQuery.setString(4, editStatusCombobox.getSelectedItem().toString());
+            updateBookQuery.setString(5, editYearCombobox.getSelectedItem().toString());
+            updateBookQuery.setString(6, editDescriptionField.getText().trim().replaceAll("\n", " "));
+            updateBookQuery.setString(7, newChapter + "");
+            updateBookQuery.setString(8, uuid);
+            updateBookQuery.executeUpdate();
+        } catch (SQLException ignored) {
+        }
     }
 
     private void onCancel() {

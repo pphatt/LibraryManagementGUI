@@ -149,8 +149,7 @@ public class MangaDexApiHandling {
                     .join();
 
             try {
-                if (Boolean.TRUE.equals(checkBookAlreadyExists(model, uuid, title, author, type, status, yearRelease,
-                        description, coverPath, chapterArray.get(i)))) {
+                if (Boolean.TRUE.equals(checkBookAlreadyExists(model, uuid))) {
                     continue;
                 }
 
@@ -301,9 +300,12 @@ public class MangaDexApiHandling {
         tags.add(t);
     }
 
-    public static Boolean checkBookAlreadyExists(DefaultTableModel model, String uuid, String title, String author, String type, String status, String yearRelease, String description, String coverPath, Integer chapter) {
+    public static Boolean checkBookAlreadyExists(DefaultTableModel model, String uuid) {
         try {
-            PreparedStatement checkBookIDDup = SQLConnectionString.getConnection().prepareStatement("Select * from Book where " + "Book.ID = ?");
+            PreparedStatement checkBookIDDup = SQLConnectionString.getConnection().prepareStatement(
+                    "Select Book.ID, Book.Title, Author.Name, Book.Status, Book.YearReleased, Book.Description, Book.Chapter, Book.Cover from Book, Author where Book.ID = ? and Book.Author = Author.ID"
+            );
+
             checkBookIDDup.setString(1, uuid);
             ResultSet checkBookIDDupRes = checkBookIDDup.executeQuery();
 
@@ -312,10 +314,30 @@ public class MangaDexApiHandling {
                     return true;
                 }
 
-                model.addRow(new Object[]{uuid, title, author, type, status, yearRelease, chapter});
+                model.addRow(new Object[]{
+                        checkBookIDDupRes.getString(1),
+                        checkBookIDDupRes.getString(2),
+                        checkBookIDDupRes.getString(3),
+                        "manga",
+                        checkBookIDDupRes.getString(4),
+                        checkBookIDDupRes.getString(5),
+                        checkBookIDDupRes.getString(7)
+                });
+
                 MainLayoutGUI.contentTable.getTable().setModel(model);
 
-                mangaArray.add(new Manga(uuid, title, author, type, status, yearRelease, description, coverPath, chapter));
+                mangaArray.add(new Manga(
+                        checkBookIDDupRes.getString(1),
+                        checkBookIDDupRes.getString(2),
+                        checkBookIDDupRes.getString(3),
+                        "manga",
+                        checkBookIDDupRes.getString(4),
+                        checkBookIDDupRes.getString(5),
+                        checkBookIDDupRes.getString(6),
+                        checkBookIDDupRes.getString(8),
+                        Integer.parseInt(checkBookIDDupRes.getString(7))
+                ));
+
                 return true;
             }
 
