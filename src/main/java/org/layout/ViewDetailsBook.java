@@ -51,7 +51,7 @@ public class ViewDetailsBook extends JDialog {
         bookChapterDetail.setText(chapter);
 
         try {
-            PreparedStatement bookGenreQuery = SQLConnectionString.getConnection().prepareStatement("Select * from BookGenre where BookID = ?");
+            PreparedStatement bookGenreQuery = SQLConnectionString.getConnection().prepareStatement("Select * from BookGenre where BookID = ? and State = '0'");
             bookGenreQuery.setString(1, uuid);
             ResultSet bookGenreQueryRes = bookGenreQuery.executeQuery();
 
